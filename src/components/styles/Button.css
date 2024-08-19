@@ -1,0 +1,21 @@
+/* Button CSS */
+.button {
+    background-color: #a2d2ff;          
+    color: rgb(44, 43, 43); 
+    border-style: none;           
+    padding: 10px 20px;       
+    text-align: center;       
+    font-size: 16px;         
+    margin: 10px 2px;        
+    cursor: pointer;         
+    border-radius: 20px;  
+    font-size:large;   
+    font-style:bold;
+    
+  }
+  
+  .button:hover {
+    background-color: #6e5a49;
+    color: whitesmoke;
+  }
+  

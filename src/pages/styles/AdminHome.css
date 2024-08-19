@@ -1,0 +1,59 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 20px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url('https://img.freepik.com/free-vector/student-with-laptop-sitting-huge-books-library-male-character-studying-computer-flat-vector-illustration-online-education-knowledge-concept-banner-website-design-landing-web-page_74855-22550.jpg?t=st=1724002914~exp=1724006514~hmac=2e2689b701770d5c19454273aa9422cf778bccac7a8667a6dec7d561f4c9939f&w=900');
+  opacity: 0.8;
+  z-index: 1;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  width: 100%;
+}
+
+.logo {
+  flex: 1;
+  text-align: left;
+}
+
+.welcome-heading {
+  flex: 2;
+  text-align: center;
+  color: rgb(42, 40, 40);
+  font-weight: bold;
+}
+
+.button-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-right: 20px;
+}
+
+.content {
+  flex: 1;
+  max-width: 50%;
+  padding-right: 20px;
+  z-index: 2;
+  margin-top: 125px;
+}
+
+.heading {
+  font-size: x-large;
+  color:  rgb(42, 40, 40);
+  font-weight: bold;
+}
+
+.paragraph {
+  font-size: 1.2rem;
+  color: rgb(42, 40, 40);
+  line-height: 1.6;
+}
