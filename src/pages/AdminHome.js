@@ -1,36 +1,93 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import Button from "../components/Button";
 import Logo from "../components/Logo";
-import "./styles/AdminHome.css";
+import './styles/AdminHome.css';
+import { useNavigate } from 'react-router-dom'
 
 function AdminHome() {
+  const [email, setEmail] = useState("");
+  const [phoneNo, setPhoneNo] = useState("");
+  const [password, setPassword] = useState("");
+  const [userType, setUserType] = useState("Admin");
+  
   const navigate = useNavigate();
 
-  const handleButtonClick = (userType) => {
-    navigate("/login", { state: { userType } });
+  const handleButtonClick = (type) => {
+    setUserType(type);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (userType === 'Admin') {
+      console.log("Email:", email);
+    } else {
+      console.log("Phone Number:", phoneNo);
+    }
+    console.log("Password:", password);
+    navigate('/adminDashboard')
   };
 
   return (
-    <div className="container">
-      <header className="header">
-        <Logo />
+    <div className="home-container">
+       <Logo className="logo" />
+      <div className="header">
+
         <h1 className="welcome-heading">Welcome Guest!</h1>
-        <div className="button-right">
-          <Button name="Admin" onClick={() => handleButtonClick("Admin")} />
-          <Button name="User" onClick={() => handleButtonClick("User")} />
-        </div>
-      </header>
-      <div className="content">
-        <h1 className="heading">Elevate your Managing Experience</h1>
-        <h4 className="paragraph">
-          Transform your library into a beacon of efficiency with Shelfvault,
-          the smart, stylish way to manage your collection. Seamlessly organize,
-          track, and connect readers with the resources they crave—all while
-          enjoying an intuitive, privacy-first platform.
-        </h4>
       </div>
-    </div>
+      {/* <div className="signin-container"> */}
+        <div className="signin-content">
+          <div className="signin-form">
+            <div className="toggle-button">
+              <Button 
+                name="Admin" 
+                onClick={() => handleButtonClick("Admin")} 
+                className={userType === "Admin" ? "button active" : "button inactive"} 
+              />
+              <Button 
+                name="User" 
+                onClick={() => handleButtonClick("User")} 
+                className={userType === "User" ? "button active" : "button inactive"} 
+              />
+            </div>
+            <p>Sign-in to Continue</p>
+            <form onSubmit={handleSubmit}>
+              <div className="signin-input-field">
+                {userType === "Admin" ? (
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                ) : (
+                  <input
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    value={phoneNo}
+                    onChange={(e) => setPhoneNo(e.target.value)}
+                    required
+                  />
+                )}
+              </div>
+              <div className="signin-input-field">
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="signin-button">
+                <Button name="Sign-in" />
+              </div>
+            </form>
+          </div>
+          <div className="signin-image"></div>
+        </div>
+      </div>
+    // </div>
   );
 }
 

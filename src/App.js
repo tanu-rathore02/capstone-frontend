@@ -5,7 +5,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Categories from "./pages/Categories";
 import Users from "./pages/Users";
 import Contact from "./pages/Contact";
-import Login from "./pages/Login";
+
 
 function App() {
   return (
@@ -17,7 +17,7 @@ function App() {
           <Route path="/categories" element={<Categories />} />
           <Route path="/users" element={<Users />} />
           <Route path="/contact" element={<Contact/>}/>
-          <Route path="/login" element={<Login/>}/>
+  
         </Routes>
       </div>
     </Router>
