@@ -14,7 +14,7 @@ function AddIssuances() {
     }
   return (
     <div className='reg-container'>
-        <h2>Add New Issuance</h2>
+        
         <FormComponent
           title={"Add Issuance"}
           formArr={formArr}

@@ -15,7 +15,7 @@ function AddBooks() {
 
   return (
     <div className='reg-container'>
-        <h2>Add New Book</h2>
+        
         <FormComponent
         title={"Add Book"}
         formArr={formArr}

@@ -1,5 +1,7 @@
 import React from "react";
 import Navbar from "../components/Navbar";
+import Header from "../components/Header";
+import HocWrapper from "../components/HocWrapper";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 
@@ -14,10 +16,9 @@ function AdminDashboard() {
 
   return (
     <div>
-      {/* <Navbar/> */}
       <Button name="Add User" onClick={handleButtonClick}/>
     </div>
   );
 }
 
-export default AdminDashboard;
+export default HocWrapper(Navbar, Header)(AdminDashboard);

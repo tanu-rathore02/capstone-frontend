@@ -7,6 +7,9 @@ import Users from "./pages/Users";
 import Contact from "./pages/Contact";
 import Books from "./pages/Books";
 import RegisterUser from "./pages/RegisterUser";
+import AddCategory from "./pages/AddCategory";
+import AddBooks from "./pages/AddBooks"
+import AddIssuances from "./pages/AddIssuances"
 
 
 function App() {
@@ -21,6 +24,9 @@ function App() {
           <Route path="/books" element={<Books/>} />
           <Route path="/contact" element={<Contact/>}/>
           <Route path="/registerUser" element={<RegisterUser/>}/>
+          <Route path="/addCategory" element={<AddCategory/>}/>
+          <Route path="/addBook" element={<AddBooks/>}/>
+          <Route path="/addIssuance" element={<AddIssuances/>}/>
     </Routes>
       </div>
     </Router>
