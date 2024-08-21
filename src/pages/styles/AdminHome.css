@@ -1,4 +1,4 @@
-/* Container for the entire home page */
+
 .home-container {
     display: flex;
     flex-direction: column;
@@ -11,7 +11,7 @@
     background-repeat: no-repeat;
 }
 
-/* Header styling */
+
 .header {
     display: flex;
     align-items: center;
@@ -19,12 +19,12 @@
     margin-bottom: 30px; 
 }
 
-/* Styling for the logo */
+
 .logo {
-    margin-right: 20px; /* Adjust spacing between logo and heading */
+    margin-right: 20px; 
 }
 
-/* Styling for the welcome heading */
+
 .welcome-heading {
     text-align: center;
     color: #3a3043;
@@ -32,7 +32,6 @@
     margin: 0; 
 }
 
-/* Container for the sign-in section */
 .signin-container {
     display: flex;
     justify-content: center;
@@ -42,10 +41,10 @@
     margin-left: 140px;
 }
 
-/* Content container for form and image, equally sized */
+
 .signin-content {
     display: flex;
-    width: 60%; /* Decreased width for better layout */
+    width: 60%; 
     height: 500px;
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
     background-color: #3a3043;
@@ -54,13 +53,12 @@
     margin-left: 270px;
 }
 
-/* Styling for the form section */
 .signin-form {
-    flex: 1; /* Ensures equal width with image section */
+    flex: 1; 
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 40px; /* Adjusted padding for better spacing */
+    padding: 40px; 
     background-color: #3a3043;
 }
 

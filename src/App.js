@@ -5,6 +5,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Categories from "./pages/Categories";
 import Users from "./pages/Users";
 import Contact from "./pages/Contact";
+import Books from "./pages/Books";
+import RegisterUser from "./pages/RegisterUser";
 
 
 function App() {
@@ -16,9 +18,10 @@ function App() {
           <Route path="/adminDashboard" element={<AdminDashboard />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/users" element={<Users />} />
+          <Route path="/books" element={<Books/>} />
           <Route path="/contact" element={<Contact/>}/>
-  
-        </Routes>
+          <Route path="/registerUser" element={<RegisterUser/>}/>
+    </Routes>
       </div>
     </Router>
   );

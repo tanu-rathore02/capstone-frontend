@@ -12,6 +12,28 @@ function AdminHome() {
   
   const navigate = useNavigate();
 
+  let template;
+  if(userType === 'Admin'){
+    template =  (
+      <input
+        type="email"
+        placeholder="Enter your email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+      />
+    );
+  } else {
+    template = (
+      <input
+        type="tel"
+        placeholder="Enter your phone number"
+        value={phoneNo}
+        onChange={(e) => setPhoneNo(e.target.value)}
+        required
+      />
+    );
+  }
   const handleButtonClick = (type) => {
     setUserType(type);
   };
@@ -34,7 +56,7 @@ function AdminHome() {
 
         <h1 className="welcome-heading">Welcome Guest!</h1>
       </div>
-      {/* <div className="signin-container"> */}
+     
         <div className="signin-content">
           <div className="signin-form">
             <div className="toggle-button">
@@ -52,23 +74,7 @@ function AdminHome() {
             <p>Sign-in to Continue</p>
             <form onSubmit={handleSubmit}>
               <div className="signin-input-field">
-                {userType === "Admin" ? (
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                ) : (
-                  <input
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    value={phoneNo}
-                    onChange={(e) => setPhoneNo(e.target.value)}
-                    required
-                  />
-                )}
+                {template}
               </div>
               <div className="signin-input-field">
                 <input
@@ -87,7 +93,7 @@ function AdminHome() {
           <div className="signin-image"></div>
         </div>
       </div>
-    // </div>
+   
   );
 }
 
