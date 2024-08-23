@@ -1,7 +1,27 @@
+
 .dashboard-container {
-    margin-left: 200px; 
-    margin-top: 120px;  
-    padding: 20px;
-    display: flex;
-    justify-content: space-around;
-  }
+  margin-left: 200px;
+  margin-top: 120px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px; 
+}
+
+.dashboard-container .cards-container {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.dashboard-container .table-container {
+  width: 100%;
+}
+
+
+
+
+
+

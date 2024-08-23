@@ -20,6 +20,8 @@
     background-color: #3a3043;
     border-radius: 15px;
     overflow: hidden;
+    align-items: center;
+    justify-content: center;
 }
 
 h2 {
@@ -56,3 +58,11 @@ h2 {
     color: #fff;
 }
 
+.formBtn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.form-container{
+
+}

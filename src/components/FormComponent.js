@@ -29,7 +29,7 @@ function FormComponent({ title, formArr, submitBtn, onsubmit }) {
                 />
             </div>
         ))}
-        <div className="form-btn">
+        <div className="formBtn">
           <Button onClick={(e) => {
             e.preventDefault();
             onSubmitHandler();

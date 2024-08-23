@@ -1,0 +1,43 @@
+
+.table-container {
+    width: 100%;
+    margin-top: 20px; 
+    display: flex;
+    justify-content: center;
+  }
+  
+  .table-component {
+    width: 90%; 
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .table-component thead {
+    background-color: #3a3043; 
+    color: #fff;
+  }
+  
+  .table-component th, .table-component td {
+    padding: 12px 15px;
+    text-align: left;
+  }
+  
+  .table-component tbody tr {
+    background-color: #E2D6DF; 
+    backdrop-filter: blur(10px);
+  }
+  
+  .table-component tbody tr:nth-child(even) {
+    background-color: #fffdfe; 
+  }
+  
+  .table-component th {
+    white-space: nowrap;
+  }
+  
+  .table-component td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
