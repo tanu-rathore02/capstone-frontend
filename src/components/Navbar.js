@@ -1,28 +1,34 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Logo from './Logo';
+import homeIcon from '../assets/homeIcon.svg';
+import dashboardIcon from '../assets/dashboardIcon.svg'
+import categoriesIcon from '../assets/categoriesIcon.svg';
+import usersIcon from '../assets/usersIcon.svg';
+import contactsIcon from '../assets/contactsIcon.svg';
+
 import './styles/Navbar.css';
 
 function Navbar() {
   return (
     <div className='sidenav'>
-      <Logo />
+      <Logo/>
       <nav className='navbar'>
         <ul>
           <li>
-            <Link to="/"><img src="/assets/icons/home.png" alt="Home" className="icon" /> Home</Link>
+            <Link to="/"><img src={homeIcon} alt="Home" className="icon" /> Home</Link>
           </li>
           <li>
-            <Link to="/adminDashboard"><img src="/assets/icons/dashboard.png" alt="Dashboard" className="icon" /> Dashboard</Link>
+            <Link to="/adminDashboard"><img src={dashboardIcon} alt="Dashboard" className="icon" /> Dashboard</Link>
           </li>
           <li>
-            <Link to="/categories"><img src="/assets/icons/categories.png" alt="Categories" className="icon" /> Categories</Link>
+            <Link to="/categories"><img src={categoriesIcon} alt="Categories" className="icon" /> Categories</Link>
           </li>
           <li>
-            <Link to="/users"><img src="/assets/icons/users.png" alt="Users" className="icon" /> Users</Link>
+            <Link to="/issuances"><img src={usersIcon} alt="Users" className="icon" />Issuances</Link>
           </li>
           <li>
-            <Link to="/contact"><img src="/assets/icons/contact.png" alt="Contact Us" className="icon" /> Contact Us</Link>
+            <Link to="/contact"><img src={contactsIcon}alt="Contact Us" className="icon" /> Contact Us</Link>
           </li>
         </ul>
       </nav>

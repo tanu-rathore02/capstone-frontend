@@ -1,0 +1,28 @@
+.header {
+  width: calc(100% - 200px);
+  height: 100px;
+  background-color: #3a3043;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  position: fixed;
+  top: 0;
+  left: 200px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.header h1 {
+  margin: 0;
+  margin-left: 10px; 
+  margin-right: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  font-family: 'Arial', sans-serif;
+}
+
+.header-btn {
+  margin-right: 50px;
+}

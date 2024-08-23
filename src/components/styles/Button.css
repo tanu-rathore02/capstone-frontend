@@ -2,13 +2,13 @@
   background-color: white;          
   color: rgb(44, 43, 43); 
   border: none;           
-  padding: 12px 24px; /* Adjust padding for larger buttons */
+  padding: 12px 24px; 
   text-align: center;       
   font-size: 16px;         
-  margin: 0 10px; /* Add margin for spacing between buttons */
+  margin: 0 10px; 
   cursor: pointer;         
   border-radius: 20px;  
-  font-weight: bold; /* Corrected font style to font-weight */
+  font-weight: bold; 
   transition: background-color 0.3s ease, opacity 0.3s ease;
 }
 
@@ -17,3 +17,6 @@
   color: rgb(47, 47, 47);
 }
 
+.button.form-btn{
+  background-color: black;
+}

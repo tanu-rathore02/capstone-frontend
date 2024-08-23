@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
-import Button from '../Button';
-import '../styles/FormComponent.css'
+import Button from './Button';
+import './styles/FormComponent.css'
 
 const prepareForm = (formArr) => {
     return formArr.reduce((r,v) => ({...r,[v.name]: ""}), {});
@@ -33,7 +33,7 @@ function FormComponent({ title, formArr, submitBtn, onsubmit }) {
           <Button onClick={(e) => {
             e.preventDefault();
             onSubmitHandler();
-        }} name = {submitBtn}/>
+        }} name = {submitBtn} className= "form-btn"/>
         </div>
         
       </form>

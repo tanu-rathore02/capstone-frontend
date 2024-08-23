@@ -1,0 +1,29 @@
+.card-container {
+    align-items: center;
+    padding: 20px;
+    margin: 10px 0; 
+    width: 220px;
+    height: 180px;
+    border-radius: 8px;
+    background-color: #E2D6DF;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .card-container img {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+  }
+  
+  .card-h {
+    margin: 10px 0;
+    font-size: 20px;
+    color:#3a3043;
+  }
+  
+  .card-p {
+    font-size: 18px;
+    color: #3a3043;
+  }
+  

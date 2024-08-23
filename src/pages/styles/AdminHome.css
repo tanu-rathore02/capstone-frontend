@@ -12,7 +12,7 @@
 }
 
 
-.header {
+.home-header {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -33,6 +33,7 @@
 }
 
 .signin-container {
+    margin-top: 100px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -43,6 +44,7 @@
 
 
 .signin-content {
+    margin-top: 50px;
     display: flex;
     width: 60%; 
     height: 500px;
@@ -62,25 +64,23 @@
     background-color: #3a3043;
 }
 
-/* Styling for the toggle buttons container */
 .toggle-button {
     display: flex;
     justify-content: center;
     margin-top: 0;
-    margin-bottom: 20px; /* Spacing below buttons */
-    gap: 10px; /* Space between buttons */
+    margin-bottom: 20px;
+    gap: 10px; 
 }
 
 .signin-input-field {
     margin-right: 10px;
 }
 
-/* Styling for the input fields */
 .signin-input-field input {
     width: 100%;
-    padding: 12px; /* Padding for better usability */
+    padding: 12px; 
 
-    margin-bottom: 30px; /* Space between input fields */
+    margin-bottom: 30px; 
     
     border-radius: 5px;
     border: 1px solid #ccc;
@@ -93,22 +93,22 @@ p{
     margin-bottom: 50px;
 }
 
-/* Styling for the sign-in button */
+
 .signin-button {
     display: flex;
-    justify-content: center; /* Center the button */
+    justify-content: center; 
     width: 100%;
 }
 
-/* Styling for the image section */
+
 .signin-image {
-    flex: 1; /* Ensures equal width with form section */
+    flex: 1; 
     background-image: url('https://img.freepik.com/free-vector/tablet-login-concept-illustration_114360-7863.jpg?t=st=1724074541~exp=1724078141~hmac=c13773f06aa390ede8e75fb8e8cb75ba632e6b14ae8a928ea13e9655e2e61889&w=740'); 
     background-size: cover;
     background-position: center;
 }
 
-/* Styling for the toggle buttons based on active state */
+
 .button.active {
     background-color: white;
     color: #3a3043;
@@ -116,13 +116,13 @@ p{
 }
 
 .button.inactive {
-    background-color: rgba(255, 255, 255, 0.5); /* Translucent when inactive */
+    background-color: rgba(255, 255, 255, 0.5); 
     color: #3a3043;
     opacity: 0.6;
 }
 
-/* Placeholder styling */
+
 input::placeholder {
     font-size: medium;
-    color: #aaa; /* Slightly darker placeholder text */
+    color: #aaa; 
 }

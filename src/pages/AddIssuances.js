@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import FormComponent from '../components/form/FormComponent'
+import FormComponent from '../components/FormComponent'
 
 
 function AddIssuances() {

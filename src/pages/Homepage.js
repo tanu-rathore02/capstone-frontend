@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Button from "../components/Button";
-import Logo from "../components/Logo";
+
 import './styles/AdminHome.css';
 import { useNavigate } from 'react-router-dom'
 
@@ -51,8 +51,8 @@ function AdminHome() {
 
   return (
     <div className="home-container">
-       <Logo className="logo" />
-      <div className="header">
+      
+      <div className="home-header">
 
         <h1 className="welcome-heading">Welcome Guest!</h1>
       </div>

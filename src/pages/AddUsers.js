@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import FormComponent from '../components/form/FormComponent'
-import './styles/FormContainer.css'
+import FormComponent from '../components/FormComponent'
+
 
 function RegisterUser() {
 
