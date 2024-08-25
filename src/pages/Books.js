@@ -1,21 +1,12 @@
-import React from 'react'
-import Navbar from '../components/Navbar'
-import { useNavigate } from 'react-router-dom';
-import Button from '../components/Button';
+import React from "react";
+import Navbar from "../components/Navbar";
+import Header from "../components/Header";
+import HocWrapper from "../components/HocWrapper";
+import { useNavigate } from "react-router-dom";
+import Button from "../components/Button";
 
 function Books() {
-
-  const navigate = useNavigate();
-
-  const handleButtonClick = () => {
-    navigate("/addBook");
-  }
-  return (
-    <div>
-      {/* <Navbar/>Books */}
-      <Button name="Add Book" onClick={handleButtonClick}/>
-      </div>
-  )
+  return <div></div>;
 }
 
-export default Books
+export default HocWrapper(Navbar, Header)(Books);

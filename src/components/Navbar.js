@@ -6,12 +6,13 @@ import dashboardIcon from '../assets/dashboardIcon.svg'
 import categoriesIcon from '../assets/categoriesIcon.svg';
 import usersIcon from '../assets/usersIcon.svg';
 import contactsIcon from '../assets/contactsIcon.svg';
+import booksIcon from '../assets/booksIcon.svg';
 
 import './styles/Navbar.css';
 
 function Navbar() {
   return (
-    <div className='sidenav'>
+    <div className='navbar-container'>
       <Logo/>
       <nav className='navbar'>
         <ul>
@@ -23,6 +24,9 @@ function Navbar() {
           </li>
           <li>
             <Link to="/categories"><img src={categoriesIcon} alt="Categories" className="icon" /> Categories</Link>
+          </li>
+          <li>
+            <Link to="/books"><img src={booksIcon} alt="Categories" className="icon" />Books</Link>
           </li>
           <li>
             <Link to="/issuances"><img src={usersIcon} alt="Users" className="icon" />Issuances</Link>

@@ -2,7 +2,9 @@ import React from 'react'
 
 function Searchbar() {
   return (
-    <div>Searchbar</div>
+    <div>
+      <input type="text" className="search-bar" placeholder="Search books, categories..." />
+    </div>
   )
 }
 

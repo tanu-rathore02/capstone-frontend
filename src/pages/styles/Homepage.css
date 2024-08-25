@@ -29,12 +29,11 @@
     text-align: center;
     color: #3a3043;
     font-weight: bold;
-    margin: 0; 
+    margin-top: 20px; 
 }
 
 .signin-container {
-    margin-top: 100px;
-    display: flex;
+     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #c4b7d0;
@@ -44,7 +43,6 @@
 
 
 .signin-content {
-    margin-top: 50px;
     display: flex;
     width: 60%; 
     height: 500px;

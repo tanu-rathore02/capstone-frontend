@@ -1,15 +1,13 @@
 
-.sidenav {
+.navbar-container {
   width: 200px;
   height: 100vh;
   background-color: #3a3043;
   position: fixed;
   top: 0;
-
   display: flex;
   flex-direction: column;
   align-items: center;
-
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
 }
 

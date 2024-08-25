@@ -1,6 +1,10 @@
 import React from 'react'
 import Navbar from '../components/Navbar'
-import Button from '../components/Button'
+import Header from '../components/Header';
+import HocWrapper from '../components/HocWrapper';
+import Button from '../components/Button';
+import Searchbar from '../components/Searchbar';
+import CategoryTable from '../components/CategoryTable';
 import { useNavigate } from 'react-router-dom';
 
 function Categories() {
@@ -11,11 +15,10 @@ function Categories() {
     navigate("/addCategory");
   };
   return (
-    <div>Categories
-      {/* <Navbar/> */}
-      <Button name="Add Category" onClick={handleButtonClick}/>
+    <div>
+      
     </div>
   )
 }
 
-export default Categories
+export default HocWrapper(Navbar, Header)(Categories);
