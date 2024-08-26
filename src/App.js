@@ -1,5 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Provider } from "react-redux";
+import {store} from './app/store'
 import Homepage from "./pages/Homepage";
 import AdminDashboard from "./pages/AdminDashboard";
 import Categories from "./pages/Categories";
@@ -13,6 +15,7 @@ import AddIssuances from "./pages/AddIssuances";
 
 function App() {
   return (
+    <Provider store={store}>
     <Router>
       <div>
         <Routes>
@@ -29,6 +32,7 @@ function App() {
         </Routes>
       </div>
     </Router>
+    </Provider>
   );
 }
 

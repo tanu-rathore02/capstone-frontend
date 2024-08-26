@@ -1,21 +1,27 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import FormComponent from '../components/FormComponent'
-
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import FormComponent from "../components/FormComponent";
+import { useDispatch } from "react-redux";
+import { registerUser } from "../features/auth/authSlice";
 
 function RegisterUser() {
-
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const onSubmitHandler = (form, callback) => {
-   console.log("Form Submitted:", form);
-    callback();
-    navigate('/adminDashboard');
+  const onSubmitHandler = async (form, callback) => {
+    try {
+      await dispatch(registerUser(form)).unwrap();
+      console.log("Form Submitted:", form);
+      callback();
+      navigate("/adminDashboard");
+    } catch (error) {
+      console.error("Signup failed:", error);
+      // Handle signup error (e.g., show an error message)
+    }
   };
 
   return (
     <div>
-      
       <FormComponent
         title={"Add New User"}
         formArr={formArr}
@@ -24,7 +30,7 @@ function RegisterUser() {
       />
     </div>
   );
-};
+}
 
 const formArr = [
   {
@@ -45,14 +51,13 @@ const formArr = [
   {
     label: "Password",
     name: "password",
-    type: "Password",
+    type: "password",
   },
   {
     label: "Confirm Password",
-    name: "password",
+    name: "confirmPassword",
     type: "password",
   },
 ];
 
-export default RegisterUser
-
+export default RegisterUser;

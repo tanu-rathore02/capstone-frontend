@@ -1,5 +1,5 @@
 import React from 'react';
-import './styles/TableComponent.css'
+import './styles/TableComponent.css';
 
 const TableComponent = ({ columns, data }) => {
   return (
@@ -16,7 +16,11 @@ const TableComponent = ({ columns, data }) => {
           {data.map((row, rowIndex) => (
             <tr key={rowIndex}>
               {columns.map((col, colIndex) => (
-                <td key={colIndex}>{row[col.accessor]}</td>
+                <td key={colIndex}>
+                  {typeof col.accessor === 'function'
+                    ? col.accessor(row)
+                    : row[col.accessor]}
+                </td>
               ))}
             </tr>
           ))}

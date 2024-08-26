@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Logo from './Logo';
-import homeIcon from '../assets/homeIcon.svg';
 import dashboardIcon from '../assets/dashboardIcon.svg'
 import categoriesIcon from '../assets/categoriesIcon.svg';
 import usersIcon from '../assets/usersIcon.svg';
@@ -16,9 +15,7 @@ function Navbar() {
       <Logo/>
       <nav className='navbar'>
         <ul>
-          <li>
-            <Link to="/"><img src={homeIcon} alt="Home" className="icon" /> Home</Link>
-          </li>
+         
           <li>
             <Link to="/adminDashboard"><img src={dashboardIcon} alt="Dashboard" className="icon" /> Dashboard</Link>
           </li>

@@ -7,7 +7,7 @@ function Header() {
     <div className='header'>
       <h1>Welcome Admin</h1>
       <div className='header-btn'>
-         <Button name="logout"/>
+         <Button name="Sign-out" className="form-btn"/>
       </div>
     
     </div>

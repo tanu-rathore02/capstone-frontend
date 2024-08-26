@@ -1,7 +1,19 @@
 .search-bar {
-    padding: 8px;
-    border-radius: 20px;
-    border: 1px solid #A2A2A2;
-    width: 250px;
-    background-color: #F1EAF3;
-  }
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 25px; /* Makes the search bar curved */
+  outline: none;
+  transition: border-color 0.3s ease-in-out;
+}
+
+/* .search-bar::placeholder {
+  color: #E2D6DF; /* Placeholder text color */
+/* } */ 
+
+/* .search-bar:focus {
+  border-color: #007BFF; /* Change border color on focus */
+  /* box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Adds a subtle shadow on focus */
+/* / */

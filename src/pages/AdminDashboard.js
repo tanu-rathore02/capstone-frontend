@@ -25,10 +25,10 @@ function AdminDashboard() {
       </div>
       
       <CategoryTable />
-      <Link to="/categories">Browse more categories</Link>
+      <Link to="/categories">Browse all categories</Link>
     
       <BooksTable/>
-      <Link to="/Books">Browse more Books</Link>
+      <Link to="/Books">Browse all Books</Link>
     </div>
   );
 }

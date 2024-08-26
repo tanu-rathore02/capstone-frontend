@@ -1,10 +1,15 @@
-import React from 'react';
-import './styles/Button.css'
+import React from "react";
+import "./styles/Button.css";
 
-function Button( {name, onClick}) {
+function Button({ name, onClick, active, className }) {
   return (
     <div>
-      <button className="button" onClick={onClick}>{name}</button>
+      <button
+        className={`button ${className} ${active ? "active" : "inactive"}`}
+        onClick={onClick}
+      >
+        {name}
+      </button>
     </div>
   );
 }

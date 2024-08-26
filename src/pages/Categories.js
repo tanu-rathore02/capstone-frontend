@@ -6,6 +6,7 @@ import Button from '../components/Button';
 import Searchbar from '../components/Searchbar';
 import CategoryTable from '../components/CategoryTable';
 import { useNavigate } from 'react-router-dom';
+import './styles/Pages.css';
 
 function Categories() {
   
@@ -15,8 +16,10 @@ function Categories() {
     navigate("/addCategory");
   };
   return (
-    <div>
-      
+    <div className='pages-container'>
+      <Searchbar/>
+      <Button name = "Add Category" className= "form-btn" onClick={handleButtonClick}/>
+      <CategoryTable/>
     </div>
   )
 }
