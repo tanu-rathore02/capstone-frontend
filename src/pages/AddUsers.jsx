@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import FormComponent from "../components/FormComponent";
 import { useDispatch } from "react-redux";
-import { registerUser } from "../features/auth/authSlice";
+import { signupUser } from "../features/auth/authSlice";
 
 function RegisterUser() {
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ function RegisterUser() {
 
   const onSubmitHandler = async (form, callback) => {
     try {
-      await dispatch(registerUser(form)).unwrap();
+      await dispatch(signupUser(form)).unwrap();
       console.log("Form Submitted:", form);
       callback();
       navigate("/adminDashboard");

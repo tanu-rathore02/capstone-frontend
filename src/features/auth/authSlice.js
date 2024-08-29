@@ -1,57 +1,40 @@
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-// Create an Axios instance
-const api = axios.create({
-  baseURL: "http://localhost:8080/auth",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-// Add a request interceptor to set the token dynamically
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
-
-// Login User (Async Thunk)
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await api.post("/login", credentials);
+      const response = await axios.post("http://localhost:8080/api/login", credentials);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "An error occurred");
+      console.error("Login error:", error.response || error.message);
+      if (error.response) {
+        return rejectWithValue(error.response.data);
+      }
+      return rejectWithValue({ message: "Network Error" });
     }
   }
 );
 
-// Register User (Async Thunk)
-export const registerUser = createAsyncThunk(
-  "auth/registerUser",
+
+export const signupUser = createAsyncThunk(
+  "auth/signup",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await api.post("/signup", userData);
+      const response = await axios.post("http://localhost:8080/api/register", userData);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "An error occurred");
+      return rejectWithValue(error.response.data);
     }
   }
 );
 
-// Slice
 const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
-    token: localStorage.getItem("token") || null,
+    token: null,
     status: "idle",
     error: null,
   },
@@ -59,35 +42,29 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.token = null;
-      state.status = "idle";
-      // Clear token from localStorage
       localStorage.removeItem("token");
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(loginUser.pending, (state) => {
-        state.status = "loading";
-      })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.user = action.payload.user;
         state.token = action.payload.token;
-        // Save token in localStorage
+        console.log(state.user);
+        console.log(state.token);
+        
+        localStorage.setItem("token", action.payload.token);
+      })
+      .addCase(signupUser.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+       
         localStorage.setItem("token", action.payload.token);
       })
       .addCase(loginUser.rejected, (state, action) => {
-        state.status = "failed";
         state.error = action.payload;
       })
-      .addCase(registerUser.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(registerUser.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.user = action.payload;
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.status = "failed";
+      .addCase(signupUser.rejected, (state, action) => {
         state.error = action.payload;
       });
   },
@@ -96,4 +73,3 @@ const authSlice = createSlice({
 export const { logout } = authSlice.actions;
 
 export default authSlice.reducer;
-

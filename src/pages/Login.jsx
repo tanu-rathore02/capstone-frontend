@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import Button from "../components/Button";
-import "./styles/Homepage.css";
+import "../styles/Login.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { loginUser } from "../features/auth/authSlice";
+import { loginUser, signupUser } from "../features/auth/authSlice";
 
-function AdminHome() {
+function Login() {
   const [email, setEmail] = useState("");
   const [phoneNo, setPhoneNo] = useState("");
   const [password, setPassword] = useState("");
-  const [userType, setUserType] = useState("Admin");
+  const [userType, setUserType] = useState("ADMIN");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -20,19 +20,34 @@ function AdminHome() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const credentials = {
-      username: userType === "Admin" ? email : phoneNo,
-      password,
-    };
+    if (userType === "ADMIN") {
+      // Login as Admin
+      const credentials = {
+        username: email,
+        password,
+      };
 
-    try {
-      const result = await dispatch(loginUser(credentials)).unwrap();
-      // Save the JWT token to localStorage
-      localStorage.setItem("token", result.token);
+      try {
+        const result = await dispatch(loginUser(credentials)).unwrap();
+        localStorage.setItem("token", result.token);
+        navigate("/adminDashboard");
+      } catch (error) {
+        console.error("Login failed:", error);
+      }
+    } else {
+      // Login as User
+      const credentials = {
+        username: phoneNo,
+        password,
+      };
 
-      navigate("/adminDashboard");
-    } catch (error) {
-      console.error("Login failed:", error);
+      try {
+        const result = await dispatch(loginUser(credentials)).unwrap();
+        localStorage.setItem("token", result.token);
+        navigate("/adminDashboard");
+      } catch (error) {
+        console.error("Login failed:", error);
+      }
     }
   };
 
@@ -55,7 +70,7 @@ function AdminHome() {
               active={userType === "User"}
             />
           </div>
-          <p>Sign-in to Continue</p>
+          <p>Sign-in to continue</p>
           <form onSubmit={handleSubmit}>
             <div className="signin-input-field">
               {userType === "Admin" ? (
@@ -67,13 +82,15 @@ function AdminHome() {
                   required
                 />
               ) : (
-                <input
-                  type="tel"
-                  placeholder="Enter your phone number"
-                  value={phoneNo}
-                  onChange={(e) => setPhoneNo(e.target.value)}
-                  required
-                />
+                <>
+                  <input
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    value={phoneNo}
+                    onChange={(e) => setPhoneNo(e.target.value)}
+                    required
+                  />
+                </>
               )}
             </div>
             <div className="signin-input-field">
@@ -86,7 +103,7 @@ function AdminHome() {
               />
             </div>
             <div className="signin-button">
-              <Button name="Sign-in" className="form-btn" />
+              <Button name="sign-in" className="form-btn" />
             </div>
           </form>
         </div>
@@ -96,5 +113,5 @@ function AdminHome() {
   );
 }
 
-export default AdminHome;
+export default Login;
 

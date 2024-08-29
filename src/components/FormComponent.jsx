@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import Button from './Button';
-import './styles/FormComponent.css'
+import '../styles/FormComponent.css'
 
 const prepareForm = (formArr) => {
     return formArr.reduce((r,v) => ({...r,[v.name]: ""}), {});

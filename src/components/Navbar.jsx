@@ -7,7 +7,7 @@ import usersIcon from '../assets/usersIcon.svg';
 import contactsIcon from '../assets/contactsIcon.svg';
 import booksIcon from '../assets/booksIcon.svg';
 
-import './styles/Navbar.css';
+import '../styles/Navbar.css';
 
 function Navbar() {
   return (
@@ -27,6 +27,9 @@ function Navbar() {
           </li>
           <li>
             <Link to="/issuances"><img src={usersIcon} alt="Users" className="icon" />Issuances</Link>
+          </li>
+          <li>
+            <Link to="/users"><img src={usersIcon} alt="Users" className="icon" />Users</Link>
           </li>
           <li>
             <Link to="/contact"><img src={contactsIcon}alt="Contact Us" className="icon" /> Contact Us</Link>

@@ -1,6 +1,6 @@
 import React from 'react'
 import Button from './Button'
-import './styles/Header.css'
+import '../styles/Header.css'
 
 function Header() {
   return (
