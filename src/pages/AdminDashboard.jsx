@@ -24,10 +24,10 @@ function AdminDashboard() {
         <Card name="Issued Books" value="45" image={issuedBooks} />
       </div>
       
-      <CategoryTable />
+      <CategoryTable showPagination={false} />
       <Link to="/categories">Browse all categories</Link>
     
-      <BooksTable/>
+      <BooksTable showPagination={false}/>
       <Link to="/Books">Browse all Books</Link>
     </div>
   );

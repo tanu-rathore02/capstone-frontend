@@ -14,11 +14,14 @@ function Books() {
   const handleButtonClick = () => {
     navigate("/addBooks");
   };
+
   return (
     <div className='pages-container'>
-      <Searchbar/>
-      <Button name = "Add Book" className= "form-btn" onClick={handleButtonClick}/>
-      <BooksTable/>
+      <div className='controls-container'>
+        <Searchbar/>
+        <Button name= "Add Book" className="page-btn" onClick={handleButtonClick}/>
+      </div>
+      <BooksTable showPagination={true}/>
     </div>
   )
 }

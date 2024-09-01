@@ -39,13 +39,14 @@
 
 .signin-content {
     display: flex;
-    width: 60%; 
+    width: 65%; 
     height: 500px;
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
     background-color: #3a3043;
     border-radius: 15px;
     overflow: hidden;
     margin-left: 270px;
+    justify-content: center;
 }
 
 .signin-form {
@@ -96,7 +97,7 @@ p{
 
 .signin-image {
     flex: 1; 
-    background-image: url('https://img.freepik.com/free-vector/tablet-login-concept-illustration_114360-7863.jpg?t=st=1724074541~exp=1724078141~hmac=c13773f06aa390ede8e75fb8e8cb75ba632e6b14ae8a928ea13e9655e2e61889&w=740'); 
+    background-image: url('https://img.freepik.com/free-vector/hand-drawn-flat-design-book-club-illustration_23-2149334858.jpg?t=st=1724965307~exp=1724968907~hmac=d6a2ae991334c5a5444504b99ef6dd809ce142f19f60d7f0006493dcb04aa49b&w=740');
     background-size: cover;
     background-position: center;
 }

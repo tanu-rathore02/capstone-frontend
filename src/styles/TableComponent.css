@@ -1,9 +1,10 @@
 
-.table-container {
+   .table-container {
     width: 100%;
     margin-top: 20px; 
     display: flex;
-    justify-content: center;
+    flex-direction: column; 
+    align-items: center; 
   }
   
   .table-component {
@@ -39,5 +40,46 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  
+  .table-component td div {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center; 
+    gap: 10px;
+  }
+  
+
+  .pagination-controls {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+  }
+  
+  .pagination-controls button {
+    background-color:#796987; 
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .pagination-controls button:disabled {
+    background-color: #ccc; 
+    cursor: not-allowed;
+  }
+  
+  .pagination-controls span {
+    margin: 0 10px;
+    color: #3a3043; 
+    font-weight: bold;
+  }
+  
+  .pagination-controls button:hover:not(:disabled) {
+    background-color: #6d4b78; 
   }
   

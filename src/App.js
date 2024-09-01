@@ -13,6 +13,7 @@ import AddUsers from "./pages/AddUsers";
 import AddCategory from "./pages/AddCategory";
 import AddBooks from "./pages/AddBooks";
 import AddIssuances from "./pages/AddIssuances";
+import ProtectedRoutes from "./route/ProtectedRoutes";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<Login/>} />
+          <Route element= {<ProtectedRoutes/>}>
           <Route path="/adminDashboard" element={<AdminDashboard />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/issuances" element={<Issuances />} />
@@ -31,6 +33,7 @@ function App() {
           <Route path="/addCategory" element={<AddCategory />} />
           <Route path="/addBooks" element={<AddBooks />} />
           <Route path="/addIssuance" element={<AddIssuances />} />
+        </Route>
         </Routes>
       </div>
     </Router>

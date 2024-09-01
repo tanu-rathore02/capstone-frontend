@@ -3,13 +3,14 @@ import Button from "../components/Button";
 import "../styles/Login.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { loginUser, signupUser } from "../features/auth/authSlice";
+import { loginUser } from "../features/auth/authSlice";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [phoneNo, setPhoneNo] = useState("");
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState("ADMIN");
+  const [errors, setErrors] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -17,37 +18,58 @@ function Login() {
     setUserType(type);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {};
 
-    if (userType === "ADMIN") {
-      // Login as Admin
-      const credentials = {
-        username: email,
-        password,
-      };
-
-      try {
-        const result = await dispatch(loginUser(credentials)).unwrap();
-        localStorage.setItem("token", result.token);
-        navigate("/adminDashboard");
-      } catch (error) {
-        console.error("Login failed:", error);
+    if (userType === "Admin") {
+      // Validate email
+      if (!email) {
+        newErrors.email = "Email is required.";
+        isValid = false;
+      } else if (!/\S+@\S+\.\S+/.test(email)) {
+        newErrors.email = "Invalid email format.";
+        isValid = false;
       }
     } else {
-      // Login as User
-      const credentials = {
-        username: phoneNo,
-        password,
-      };
-
-      try {
-        const result = await dispatch(loginUser(credentials)).unwrap();
-        localStorage.setItem("token", result.token);
-        navigate("/adminDashboard");
-      } catch (error) {
-        console.error("Login failed:", error);
+      // Validate phone number
+      if (!phoneNo) {
+        newErrors.phoneNo = "Phone number is required.";
+        isValid = false;
+      } else if (!/^\d+$/.test(phoneNo)) {
+        newErrors.phoneNo = "Phone number must contain only digits.";
+        isValid = false;
       }
+    }
+
+    // Validate password
+    if (!password) {
+      newErrors.password = "Password is required.";
+      isValid = false;
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters long.";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    const credentials = userType === "Admin" ? { username: email, password } : { username: phoneNo, password };
+
+    try {
+      const result = await dispatch(loginUser(credentials)).unwrap();
+      localStorage.setItem("token", result.token);
+      navigate("/adminDashboard");
+    } catch (error) {
+      console.error("Login failed:", error);
     }
   };
 
@@ -74,13 +96,15 @@ function Login() {
           <form onSubmit={handleSubmit}>
             <div className="signin-input-field">
               {userType === "Admin" ? (
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
+                <>
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                  {errors.email && <p className="error-message">{errors.email}</p>}
+                </>
               ) : (
                 <>
                   <input
@@ -88,8 +112,8 @@ function Login() {
                     placeholder="Enter your phone number"
                     value={phoneNo}
                     onChange={(e) => setPhoneNo(e.target.value)}
-                    required
                   />
+                  {errors.phoneNo && <p className="error-message">{errors.phoneNo}</p>}
                 </>
               )}
             </div>
@@ -99,11 +123,11 @@ function Login() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
               />
+              {errors.password && <p className="error-message">{errors.password}</p>}
             </div>
             <div className="signin-button">
-              <Button name="sign-in" className="form-btn" />
+              <Button name="Sign In" className="form-btn" />
             </div>
           </form>
         </div>
@@ -114,4 +138,5 @@ function Login() {
 }
 
 export default Login;
+
 

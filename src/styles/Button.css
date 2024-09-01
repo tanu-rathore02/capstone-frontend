@@ -30,8 +30,52 @@
   opacity: 0.6;
 }
 
-.button.form-btn {
+.button.form-btn{
   background-color: white;
   color: rgb(44, 43, 43);
   opacity: 1;
+}
+
+.button.page-btn {
+  background-color: #E2D6DF;
+  color: #3a3043;
+  opacity: 1;
+}
+
+
+.button.page-btn:hover {
+  background-color: #3a3043; 
+  color: white;
+}
+
+/* Table Button Styles */
+.button.table-btn {
+  background-color: #796987; 
+  color: white; 
+  border: none;
+  opacity: 1;
+  padding: 6px 12px; 
+  text-align: center;
+  font-size: 13px; 
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+  display: inline-block; 
+  min-width: 60px; 
+  margin: 0 3px; 
+}
+
+
+.button.table-btn:hover {
+  background-color: #c4b7d0;
+  color: #3a3043; 
+}
+
+
+.button.table-component td div {
+  display: flex;
+  justify-content: flex-start; 
+  align-items: center;
+  gap: 8px;
 }
