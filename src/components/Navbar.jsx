@@ -6,6 +6,7 @@ import categoriesIcon from '../assets/categoriesIcon.svg';
 import usersIcon from '../assets/usersIcon.svg';
 import contactsIcon from '../assets/contactsIcon.svg';
 import booksIcon from '../assets/booksIcon.svg';
+import issuancesIcon from '../assets/issuancesIcon.svg';
 
 import '../styles/Navbar.css';
 
@@ -26,7 +27,7 @@ function Navbar() {
             <Link to="/books"><img src={booksIcon} alt="Categories" className="icon" />Books</Link>
           </li>
           <li>
-            <Link to="/issuances"><img src={usersIcon} alt="Users" className="icon" />Issuances</Link>
+            <Link to="/issuances"><img src={issuancesIcon} alt="Issuances" className="icon" />Issuances</Link>
           </li>
           <li>
             <Link to="/users"><img src={usersIcon} alt="Users" className="icon" />Users</Link>
