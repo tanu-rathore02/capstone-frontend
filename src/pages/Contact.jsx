@@ -7,8 +7,7 @@ import HocWrapper from "../components/HocWrapper";
 function Contact() {
   return (
     <div>
-      
-      Contact
+       Contact
     </div>
   );
 }

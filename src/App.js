@@ -22,6 +22,7 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<Login/>} />
+
           <Route element= {<ProtectedRoutes/>}>
           <Route path="/adminDashboard" element={<AdminDashboard />} />
           <Route path="/categories" element={<Categories />} />
@@ -34,6 +35,7 @@ function App() {
           <Route path="/addBooks" element={<AddBooks />} />
           <Route path="/addIssuance" element={<AddIssuances />} />
         </Route>
+        
         </Routes>
       </div>
     </Router>

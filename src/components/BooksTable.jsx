@@ -1,9 +1,9 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import TableComponent from "./TableComponent";
-import Modal from "./Modal";
-import Button from "./Button";
+import Button from "../components/Button";
+import Modal from "../components/Modal";
+import TableComponent from "../components/TableComponent";
 
 function BooksTable({ showPagination = true }) {
   const [data, setData] = useState([]);
@@ -12,12 +12,10 @@ function BooksTable({ showPagination = true }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
-  const [formState, setFormState] = useState({
-    title: "",
-    author: "",
-    availability: "",
-    category: ""
-  });
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [availability, setAvailability] = useState('');
+  const [categoryId, setCategoryId] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -56,12 +54,10 @@ function BooksTable({ showPagination = true }) {
 
   const handleEdit = (book) => {
     setSelectedBook(book);
-    setFormState({
-      title: book.title,
-      author: book.author,
-      availability: book.availability,
-      category: book.category || ""
-    });
+    setTitle(book.title);
+    setAuthor(book.author);
+    setAvailability(book.availability);
+    setCategoryId(book.categoryId || '');
     setIsEditModalOpen(true);
   };
 
@@ -70,21 +66,17 @@ function BooksTable({ showPagination = true }) {
     setIsDeleteModalOpen(true);
   };
 
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormState({ ...formState, [name]: value });
-  };
-
   const handleUpdateBook = async () => {
     try {
       const token = localStorage.getItem('token');
       const updateData = {
-        title: formState.title,
-        author: formState.author,
-        categoryId: formState.category,
-        availability: formState.availability
+        title: title,
+        author: author,
+        categoryId: categoryId,
+        availability: availability
       };
 
+      console.log(updateData);
       await axios.put(
         `http://localhost:8080/api/books/updateBook/${selectedBook.sno}`,
         updateData,
@@ -93,7 +85,10 @@ function BooksTable({ showPagination = true }) {
 
       setIsEditModalOpen(false);
       setSelectedBook(null);
-      setFormState({ title: "", author: "", availability: "", category: "" });
+      setTitle('');
+      setAuthor('');
+      setAvailability('');
+      setCategoryId('');
       fetchData();
     } catch (error) {
       console.error("Error updating book", error);
@@ -187,31 +182,29 @@ function BooksTable({ showPagination = true }) {
         >
           <input
             type="text"
-            name="title"
             placeholder="Title"
-            value={formState.title}
-            onChange={handleFormChange}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
           <input
             type="text"
-            name="author"
             placeholder="Author"
-            value={formState.author}
-            onChange={handleFormChange}
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
           />
           <input
             type="text"
-            name="category"
-            placeholder="Category"
-            value={formState.category}
-            onChange={handleFormChange}
+            placeholder="CategoryId"
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
           />
+
+         
           <input
             type="number"
-            name="availability"
             placeholder="Availability"
-            value={formState.availability}
-            onChange={handleFormChange}
+            value={availability}
+            onChange={(e) => setAvailability(e.target.value)}
           />
           <Button name="Update" className="page-btn" />
         </form>
@@ -223,7 +216,7 @@ function BooksTable({ showPagination = true }) {
         height="150px"
         width="300px"
       >
-        <p>Are you sure you want to delete this Book?</p>
+        <p>Are you sure you want to delete this book?</p>
         <Button
           name="Delete"
           className="page-btn"
@@ -240,4 +233,3 @@ function BooksTable({ showPagination = true }) {
 }
 
 export default BooksTable;
-

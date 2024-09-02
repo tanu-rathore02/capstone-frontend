@@ -16,7 +16,6 @@ function RegisterUser() {
       navigate("/adminDashboard");
     } catch (error) {
       console.error("Signup failed:", error);
-      // Handle signup error (e.g., show an error message)
     }
   };
 

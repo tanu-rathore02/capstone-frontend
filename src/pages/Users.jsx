@@ -70,7 +70,7 @@ function Users() {
       <Searchbar/>
       <Button name= "Add User" className="page-btn" onClick={handleButtonClick}/>
       </div>
-      <UsersTable showPagination={true}/>
+      {/* <UsersTable showPagination={true}/> */}
       <Modal
       title ="Add User"
       isOpen = {isModalOpen}

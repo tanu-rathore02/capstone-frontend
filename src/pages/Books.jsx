@@ -15,7 +15,7 @@ function Books() {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [availabilty, setAvailability] = useState(null);
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
 
 
@@ -40,7 +40,7 @@ function Books() {
       const bookData = {
         title: title,
         author: author,
-        category: category,
+        categoryId: category,
         availabilty: availabilty,
       };
 
@@ -55,6 +55,7 @@ function Books() {
       );
 
       console.log("Book created:", response.data);
+      console.log("bookdata",bookData);
 
       handleCloseModal();
     }catch (error) {

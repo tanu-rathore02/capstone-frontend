@@ -32,7 +32,7 @@ function Login() {
         isValid = false;
       }
     } else {
-      // Validate phone number
+    
       if (!phoneNo) {
         newErrors.phoneNo = "Phone number is required.";
         isValid = false;
@@ -42,7 +42,7 @@ function Login() {
       }
     }
 
-    // Validate password
+   
     if (!password) {
       newErrors.password = "Password is required.";
       isValid = false;
