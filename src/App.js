@@ -9,10 +9,6 @@ import Issuances from "./pages/Issuances";
 import Contact from "./pages/Contact";
 import Books from "./pages/Books";
 import Users from "./pages/Users";
-import AddUsers from "./pages/AddUsers";
-import AddCategory from "./pages/AddCategory";
-import AddBooks from "./pages/AddBooks";
-import AddIssuances from "./pages/AddIssuances";
 import ProtectedRoutes from "./route/ProtectedRoutes";
 
 function App() {
@@ -30,10 +26,6 @@ function App() {
           <Route path="/books" element={<Books />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/users" element={<Users/>}/>
-          <Route path="/addUser" element={<AddUsers />} />
-          <Route path="/addCategory" element={<AddCategory />} />
-          <Route path="/addBooks" element={<AddBooks />} />
-          <Route path="/addIssuance" element={<AddIssuances />} />
         </Route>
         
         </Routes>
