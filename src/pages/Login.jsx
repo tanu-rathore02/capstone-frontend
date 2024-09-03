@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import Button from "../components/Button";
+import InputField from "../components/InputField";
 import "../styles/Login.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../features/auth/authSlice";
+
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -97,7 +99,7 @@ function Login() {
             <div className="signin-input-field">
               {userType === "Admin" ? (
                 <>
-                  <input
+                  <InputField
                     type="email"
                     placeholder="Enter your email"
                     value={email}
@@ -107,7 +109,7 @@ function Login() {
                 </>
               ) : (
                 <>
-                  <input
+                  <InputField
                     type="tel"
                     placeholder="Enter your phone number"
                     value={phoneNo}
@@ -118,7 +120,7 @@ function Login() {
               )}
             </div>
             <div className="signin-input-field">
-              <input
+              <InputField
                 type="password"
                 placeholder="Enter your password"
                 value={password}

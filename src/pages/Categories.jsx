@@ -13,6 +13,8 @@ function Categories() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categoryName, setCategoryName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [refresh, setRefresh] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(""); 
 
   const handleButtonClick = () => {
     setIsModalOpen(true);
@@ -45,23 +47,28 @@ function Categories() {
       console.log("Category created:", response.data);
 
       handleCloseModal();
+      setRefresh((prev) => !prev);
     } catch (error) {
       console.error("Error creating category", error);
       setErrorMessage("Failed to add category. Please try again");
     }
   };
 
+  const handleSearch = (term) => {
+    setSearchTerm(term); 
+  };
+
   return (
     <div className="pages-container">
       <div className="controls-container">
-        <Searchbar />
+        <Searchbar onSearch={handleSearch} /> 
         <Button
           name="Add Category"
           className="page-btn"
           onClick={handleButtonClick}
         />
       </div>
-      <CategoryTable showPagination={true} />
+      <CategoryTable showPagination={true} refresh={refresh} searchTerm={searchTerm} /> 
 
       <Modal
         title="Add Category"

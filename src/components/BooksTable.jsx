@@ -1,25 +1,23 @@
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Button from "../components/Button";
-import Modal from "../components/Modal";
-import TableComponent from "../components/TableComponent";
+import Button from "./Button";
+import Modal from "./Modal";
+import TableComponent from "./TableComponent";
+import InputField from "./InputField";
+// import apiManager from "../api/apiManager";
 
-function BooksTable({ showPagination = true }) {
+function BooksTable({ showPagination = true, refresh, searchTerm }) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [availability, setAvailability] = useState('');
-  const [categoryId, setCategoryId] = useState('');
-
-  useEffect(() => {
-    fetchData();
-  }, [currentPage]);
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [availability, setAvailability] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [categories, setCategories] = useState([]); 
 
   const fetchData = async () => {
     try {
@@ -33,13 +31,15 @@ function BooksTable({ showPagination = true }) {
             size: 10,
             sortBy: "id",
             sortDir: "asc",
-            search: "",
+            search: searchTerm || "",
           },
         }
       );
+      //const response = await apiManager.getAllBooks(currentPage);
       setData(
-        response.data.content.map((book) => ({
-          sno: book.id,
+        response.data.content.map((book, index) => ({
+          id: book.id,
+          sno: index + 1 + currentPage * 10,
           title: book.title,
           author: book.author,
           availability: book.availability,
@@ -52,13 +52,34 @@ function BooksTable({ showPagination = true }) {
     }
   };
 
-  const handleEdit = (book) => {
+  useEffect(() => {
+    fetchData();
+  }, [currentPage, searchTerm]);
+
+  useEffect(() => {
+    fetchData();
+  }, [refresh]);
+
+  
+  const handleEdit = async (book) => {
     setSelectedBook(book);
     setTitle(book.title);
     setAuthor(book.author);
     setAvailability(book.availability);
-    setCategoryId(book.categoryId || '');
-    setIsEditModalOpen(true);
+    setCategoryId(book.categoryId || "");
+
+    try {
+      const token = localStorage.getItem("token");
+      const categoryResponse = await axios.get(
+        "http://localhost:8080/api/categories/allForDropDown",
+        { headers: { Authorization: token } }
+      );
+     // const response = await apiManager.getAllCategoriesDD();
+      setCategories(categoryResponse.data);
+      setIsEditModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching categories", error);
+    }
   };
 
   const handleDelete = (book) => {
@@ -68,27 +89,27 @@ function BooksTable({ showPagination = true }) {
 
   const handleUpdateBook = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const updateData = {
         title: title,
         author: author,
         categoryId: categoryId,
-        availability: availability
+        availability: availability,
       };
 
-      console.log(updateData);
       await axios.put(
-        `http://localhost:8080/api/books/updateBook/${selectedBook.sno}`,
+        `http://localhost:8080/api/books/updateBook/${selectedBook.id}`,
         updateData,
         { headers: { Authorization: token } }
       );
+     // await apiManager.updateBook(selectedBook.id, updateData);
 
       setIsEditModalOpen(false);
       setSelectedBook(null);
-      setTitle('');
-      setAuthor('');
-      setAvailability('');
-      setCategoryId('');
+      setTitle("");
+      setAuthor("");
+      setAvailability("");
+      setCategoryId("");
       fetchData();
     } catch (error) {
       console.error("Error updating book", error);
@@ -97,12 +118,14 @@ function BooksTable({ showPagination = true }) {
 
   const handleConfirmDelete = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       await axios.delete(
-        `http://localhost:8080/api/books/deleteBook/${selectedBook.sno}`,
+        `http://localhost:8080/api/books/deleteBook/${selectedBook.id}`,
         { headers: { Authorization: token } }
       );
-
+    // try {
+    //   await apiManager.deleteBook(selectedBook.id);
+  
       setIsDeleteModalOpen(false);
       setSelectedBook(null);
       fetchData();
@@ -180,27 +203,30 @@ function BooksTable({ showPagination = true }) {
             handleUpdateBook();
           }}
         >
-          <input
+          <InputField
             type="text"
             placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <input
+          <InputField
             type="text"
             placeholder="Author"
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
           />
-          <input
-            type="text"
-            placeholder="CategoryId"
+          <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-          />
-
-         
-          <input
+          >
+            <option value="">Select Category</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.categoryName}
+              </option>
+            ))}
+          </select>
+          <InputField
             type="number"
             placeholder="Availability"
             value={availability}
@@ -213,10 +239,12 @@ function BooksTable({ showPagination = true }) {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         title="Delete Book"
-        height="150px"
-        width="300px"
+        height="250px"
+        width="350px"
       >
-        <p>Are you sure you want to delete this book?</p>
+        <p style={{ color: "black" }}>
+          Are you sure you want to delete this book?
+        </p>
         <Button
           name="Delete"
           className="page-btn"

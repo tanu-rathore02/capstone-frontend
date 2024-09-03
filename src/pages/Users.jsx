@@ -1,4 +1,5 @@
-import React, { useState} from 'react';
+
+import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Header from '../components/Header';
 import HocWrapper from '../components/HocWrapper';
@@ -10,111 +11,132 @@ import axios from 'axios';
 import Modal from '../components/Modal';
 
 function Users() {
-
+ 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
-  const [role, setRole] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [refresh, setRefresh] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(""); 
 
   const handleButtonClick = () => {
     setIsModalOpen(true);
   };
 
-  
+ 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setName('');
     setEmail('');
     setMobileNumber('');
     setPassword('');
-    setRole('');
     setErrorMessage('');
   };
 
- const handleUserSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const token = localStorage.getItem("token");
-    const userData = {
-      name: name,
-      mobileNumber: mobileNumber,
-      email: email,
-      password: password,
-      role: role,
-    };
+ 
+  const handleUserSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      
+      
+      const userData = {
+        name: name,
+        mobileNumber: mobileNumber,
+        email: email,
+        password: password,
+        role: "ROLE_USER", 
+      };
 
-    const response = await axios.post(
-      "http://localhost:8080/api/register",
-      userData,
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
-    );
-    
-    console.log("User Registered:", response.data);
-    handleCloseModal();
-  }catch (error) {
-    console.error("Error registering user", error);
-    setErrorMessage("Failed to register user. Please try again");
-  }
- };
+      
+      const response = await axios.post(
+        "http://localhost:8080/api/register",
+        userData,
+        {
+          headers: {
+            Authorization: token,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      
+      console.log("User Registered:", response.data);
+      
+      
+      handleCloseModal();
+
+      
+      setRefresh((prev) => !prev);
+    } catch (error) {
+      console.error("Error registering user", error);
+      setErrorMessage("Failed to register user. Please try again.");
+    }
+  };
+
+  
+  const handleSearch = (term) => {
+    setSearchTerm(term); 
+  };
 
   return (
-    <div className='page-container'>
+    <div className='pages-container'>
       <div className='controls-container'>
-      <Searchbar/>
-      <Button name= "Add User" className="page-btn" onClick={handleButtonClick}/>
+        <Searchbar onSearch={handleSearch}/>
+        <Button name="Add User" className="page-btn" onClick={handleButtonClick} />
       </div>
-      {/* <UsersTable showPagination={true}/> */}
+      
+      
+      <UsersTable showPagination={true} refresh={refresh} searchTerm={searchTerm}/>
+      
       <Modal
-      title ="Add User"
-      isOpen = {isModalOpen}
-      onClose = {handleCloseModal}
-      height= "200px"
-      width= "300px"
+        title="Add User"
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        height="300px"
+        width="350px"
       >
-        <form onSubmit={handleUserSubmit}>
-        <input
+        <form onSubmit={handleUserSubmit} className="user-form">
+          <input
             type="text"
             placeholder="Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            required
           />
+          
           <input
-            type="text"
+            type="email" 
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
+          
           <input
-            type="text"
+            type="tel" 
             placeholder="Mobile Number"
             value={mobileNumber}
             onChange={(e) => setMobileNumber(e.target.value)}
+            required
           />
+          
           <input
-            type="text"
+            type="password" 
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
-          <input
-            type="text"
-            placeholder="Role"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          />
+          
           {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-          <Button name="Add" className="page-btn" />
+          
+          <Button type="submit" name="Add" className="page-btn" />
         </form>
       </Modal>
     </div>
-  )
+  );
 }
 
 export default HocWrapper(Navbar, Header)(Users);

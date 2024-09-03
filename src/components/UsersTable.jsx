@@ -1,10 +1,12 @@
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import TableComponent from "./TableComponent";
 import Modal from "./Modal";
 import Button from "./Button";
+import InputField from "./InputField";
 
-function UsersTable({ showPagination = true }) {
+function UsersTable({ showPagination = true, refresh, searchTerm }) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -14,69 +16,73 @@ function UsersTable({ showPagination = true }) {
   const [name, setName] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState('');
-  const [password, setPassword] =useState('');
+  const [password, setPassword] = useState('');
 
-
-const fetchData = async () => {
+  const fetchData = async () => {
     try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(`http://localhost:8080/api/users`, {
-            headers: {
-                Authorization: token
-            },
-            params: {
-                page: currentPage,
-                size: 10,
-                sortBy: "id",
-                sortDir: "asc",
-                search: "",
-            }
-        });
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`http://localhost:8080/api/users`, {
+        headers: {
+          Authorization: token
+        },
+        params: {
+          page: currentPage,
+          size: 10,
+          sortBy: "id",
+          sortDir: "asc",
+          search: searchTerm || "",
+        },
+      });
 
-        setData(response.data.content.map(user => ({
-            sno: user.id,
-            name: user.name,
-            mobileNumber: user.mobileNumber,
-            email: user.email,
-            role: user.role,
-            password: user.password,
-        })));
-        setTotalPages(response.data.totalPages);
-    }catch (error) {
-        console.error('Error fetching users', error);
-      }
-};
+      setData(response.data.content.map((user, index) => ({
+        sno: index + 1 + currentPage * 10,
+        name: user.name,
+        mobileNumber: user.mobileNumber,
+        email: user.email,
+        role: user.role,
+        password: user.password,
+      })));
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      console.error('Error fetching users', error);
+    }
+  };
 
-useEffect(() => {
+  useEffect(() => {
     fetchData();
-}, [currentPage]);
+  }, [currentPage, searchTerm]);
 
-const handleEdit = (user) => {
+  useEffect(() => {
+    fetchData();
+  }, [refresh]);
+
+  const handleEdit = (user) => {
     setSelectedUser(user);
     setName(user.name);
     setEmail(user.email);
     setMobileNumber(user.mobileNumber);
     setPassword(user.password);
-    setRole(user.role);
     setIsEditModalOpen(true);
-  };
-
-  const handleDelete = (user) => {
-    setSelectedUser(user);
-    setIsDeleteModalOpen(true);
   };
 
   const handleUpdateUser = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:8080/api/user/${selectedUser.mobileNumber}`,
-        { name },
-        {mobileNumber},
-        {password},
-        {email},
-        {role},
-        { headers: { Authorization: token } }
+      await axios.put(
+        `http://localhost:8080/api/user/${selectedUser.mobileNumber}`,
+        {
+          name,
+          mobileNumber,
+          email,
+          password,
+          role: "ROLE_USER",
+        },
+        {
+          headers: {
+            Authorization: token,
+            'Content-Type': 'application/json',
+          },
+        }
       );
 
       setIsEditModalOpen(false);
@@ -85,11 +91,15 @@ const handleEdit = (user) => {
       setEmail('');
       setPassword('');
       setMobileNumber('');
-      setRole('');
-      fetchData();
+      fetchData(); 
     } catch (error) {
-      console.error('Error updating User', error);
+      console.error('Error updating user', error);
     }
+  };
+
+  const handleDelete = (user) => {
+    setSelectedUser(user);
+    setIsDeleteModalOpen(true);
   };
 
   const handleConfirmDelete = async () => {
@@ -107,12 +117,11 @@ const handleEdit = (user) => {
     }
   };
 
-
   const columns = [
     { header: "S.no.", accessor: "sno" },
     { header: "Name", accessor: "name" },
     { header: "Mobile Number", accessor: "mobileNumber" },
-    { header: "Email Id", accessor: "emailId" },
+    { header: "Email", accessor: "email" },
     {
       header: "Action",
       Cell: ({ row }) => (
@@ -155,39 +164,33 @@ const handleEdit = (user) => {
        title="Edit User"
        isOpen={isEditModalOpen}
        onClose={() => setIsEditModalOpen(false)}
-       height='200px'
-       width='300px'
+       height='300px'
+       width='350px'
       >
         <form onSubmit={(e) => { e.preventDefault(); handleUpdateUser();}}> 
-        <input
+          <InputField
             type='text'
             placeholder='Name'
             value={name}
             onChange={(e) => setName(e.target.value)}
           /> 
-           <input
-            type='text'
+          <InputField
+            type='email'
             placeholder='Email'
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           /> 
-           <input
-            type='text'
+          <InputField
+            type='password'
             placeholder='Password'
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           /> 
-           <input
-            type='text'
+           <InputField
+            type='tel'
             placeholder='Mobile Number'
             value={mobileNumber}
             onChange={(e) => setMobileNumber(e.target.value)}
-          /> 
-           <input
-            type='text'
-            placeholder='Role'
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
           /> 
           <Button name="Update" className="page-btn" />
         </form>
@@ -195,10 +198,10 @@ const handleEdit = (user) => {
       <Modal title="Delete User"
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        height='150px'
-        width='300px'
+        height='300x'
+        width='350px'
       >
-        <p>Are you sure you want to delete this user?</p>
+        <p style={{ color: 'black' }}>Are you sure you want to delete this user?</p>
         <Button name="Delete" className="page-btn" onClick={handleConfirmDelete} />
         <Button name="Cancel" className="page-btn" onClick={() => setIsDeleteModalOpen(false)} />
       </Modal>
@@ -207,3 +210,4 @@ const handleEdit = (user) => {
 }
 
 export default UsersTable;
+          

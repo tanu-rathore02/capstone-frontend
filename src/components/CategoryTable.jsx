@@ -1,50 +1,53 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import TableComponent from "./TableComponent";
+import Modal from "./Modal";
+import Button from "./Button";
+import InputField from "./InputField";
 
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import TableComponent from './TableComponent';
-import Modal from './Modal';
-import Button from './Button';
-
-function CategoryTable({ showPagination = true }) {
-
+function CategoryTable({ showPagination = true, refresh, searchTerm }) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [categoryName, setCategoryName] = useState('');
+  const [categoryName, setCategoryName] = useState("");
 
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:8080/api/categories/allCategories`, {
+      const response = await axios.get("http://localhost:8080/api/categories/allCategories", {
         headers: {
-          Authorization: token
+          Authorization: token,
         },
         params: {
           page: currentPage,
           size: 10,
           sortBy: "id",
           sortDir: "asc",
-          search: "",
-        }
+          search: searchTerm || "", 
+        },
       });
 
-      setData(response.data.content.map(category => ({
-        sno: category.id,
-        categoryName: category.categoryName,
-      })));
+      setData(
+        response.data.content.map((category, index) => ({
+          sno: index + 1 + currentPage * 10,
+          categoryName: category.categoryName,
+          id: category.id,
+        }))
+      );
       setTotalPages(response.data.totalPages);
     } catch (error) {
-      console.error('Error fetching the categories', error);
+      console.error("Error fetching the categories", error);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, [currentPage]);
+  }, [currentPage, searchTerm, refresh]);
 
+ 
   const handleEdit = (category) => {
     setSelectedCategory(category);
     setCategoryName(category.categoryName);
@@ -56,47 +59,58 @@ function CategoryTable({ showPagination = true }) {
     setIsDeleteModalOpen(true);
   };
 
+  const handleConfirmDelete = async () => {
+    const confirmDeletion = window.confirm(
+      "Deleting this category will also delete all associated books. Are you sure you want to proceed?"
+    );
+
+    if (confirmDeletion) {
+      try {
+        const token = localStorage.getItem("token");
+
+        await axios.delete(`http://localhost:8080/api/categories/deleteCategory/${selectedCategory.id}`, {
+          headers: { Authorization: token },
+        });
+
+        setIsDeleteModalOpen(false);
+        setSelectedCategory(null);
+        fetchData();
+      } catch (error) {
+        console.error("Error deleting category", error);
+      }
+    } else {
+      setIsDeleteModalOpen(false);
+      setSelectedCategory(null);
+    }
+  };
+
   const handleUpdateCategory = async () => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:8080/api/categories/updateCategory/${selectedCategory.sno}`,
+      const token = localStorage.getItem("token");
+      await axios.put(
+        `http://localhost:8080/api/categories/updateCategory/${selectedCategory.id}`,
         { categoryName },
         { headers: { Authorization: token } }
       );
 
       setIsEditModalOpen(false);
       setSelectedCategory(null);
-      setCategoryName('');
+      setCategoryName("");
       fetchData();
     } catch (error) {
-      console.error('Error updating category', error);
-    }
-  };
-
-  const handleConfirmDelete = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:8080/api/categories/deleteCategory/${selectedCategory.sno}`, {
-        headers: { Authorization: token },
-      });
-
-      setIsDeleteModalOpen(false);
-      setSelectedCategory(null);
-      fetchData();
-    } catch (error) {
-      console.error('Error deleting category', error);
+      console.error("Error updating category", error);
     }
   };
 
   const columns = [
-    { header: 'S.no', accessor: 'sno' },
-    { header: 'Category-Name', accessor: 'categoryName' },
+    { header: "S.no", accessor: "sno" },
+    { header: "Category-Name", accessor: "categoryName" },
     {
-      header: 'Action',
+      header: "Action",
       Cell: ({ row }) => (
         <div>
-          <Button className='table-btn' name='Edit' onClick={() => handleEdit(row)} />
-          <Button className='table-btn' name='Delete' onClick={() => handleDelete(row)} />
+          <Button className="table-btn" name="Edit" onClick={() => handleEdit(row)} />
+          <Button className="table-btn" name="Delete" onClick={() => handleDelete(row)} />
         </div>
       ),
     },
@@ -122,7 +136,9 @@ function CategoryTable({ showPagination = true }) {
           <button onClick={handlePreviousPage} disabled={currentPage === 0}>
             Previous
           </button>
-          <span>Page {currentPage + 1} of {totalPages}</span>
+          <span>
+            Page {currentPage + 1} of {totalPages}
+          </span>
           <button onClick={handleNextPage} disabled={currentPage === totalPages - 1}>
             Next
           </button>
@@ -132,26 +148,23 @@ function CategoryTable({ showPagination = true }) {
         title="Edit Category"
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        height='200px'
-        width='300px'
       >
         <form onSubmit={(e) => { e.preventDefault(); handleUpdateCategory(); }}>
-          <input
-            type='text'
-            placeholder='Category Name'
+          <InputField
+            type="text"
+            placeholder="Category Name"
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
           />
           <Button name="Update" className="page-btn" />
         </form>
       </Modal>
-      <Modal title="Delete Category"
+      <Modal
+        title="Delete Category"
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        height='150px'
-        width='300px'
       >
-        <p>Are you sure you want to delete this category?</p>
+        <p style={{ color: "black" }}>Are you sure you want to delete this category?</p>
         <Button name="Delete" className="page-btn" onClick={handleConfirmDelete} />
         <Button name="Cancel" className="page-btn" onClick={() => setIsDeleteModalOpen(false)} />
       </Modal>
@@ -160,5 +173,3 @@ function CategoryTable({ showPagination = true }) {
 }
 
 export default CategoryTable;
-
-
