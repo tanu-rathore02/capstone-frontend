@@ -5,7 +5,7 @@ import HocWrapper from "../components/HocWrapper";
 import Button from "../components/Button";
 import Searchbar from "../components/Searchbar";
 import BooksTable from '../components/BooksTable';
-import apiManager from '../api/apiManager'
+// import apiManager from '../api/apiManager'
 import '../styles/Pages.css';
 import axios from "axios";
 import Modal from "../components/Modal";
@@ -97,46 +97,63 @@ function Books() {
       <BooksTable showPagination={true} refresh={refresh} searchTerm={searchTerm}/>
 
       <Modal
-        title="Add Book"
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        height="300px"
-        width="350px"
-      >
-        <form onSubmit={handleBookSubmit}>
-          <InputField
-            type="text"
-            placeholder="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <InputField
-            type="text"
-            placeholder="Author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-          />
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)} // Set category ID
-          >
-            <option value="">Select Category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.categoryName}
-              </option>
-            ))}
-          </select>
-          <InputField
-            type="number"
-            placeholder="Availability"
-            value={availability}
-            onChange={(e) => setAvailability(e.target.value)}
-          />
-          {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-          <Button name="Add" className="page-btn" />
-        </form>
-      </Modal>
+  title="Add Book"
+  isOpen={isModalOpen}
+  onClose={handleCloseModal}
+  height="500px"
+  width="450px"
+>
+  <form onSubmit={handleBookSubmit}>
+    <label htmlFor="title">Title</label>
+    <input
+      type="text"
+      id="title"
+      placeholder="Enter book title"
+      value={title}
+      onChange={(e) => setTitle(e.target.value)}
+    />
+
+    <label htmlFor="author">Author</label>
+    <input
+      type="text"
+      id="author"
+      placeholder="Enter author name"
+      value={author}
+      onChange={(e) => setAuthor(e.target.value)}
+    />
+
+    <label htmlFor="category">Category</label>
+    <select
+      id="category"
+      value={category}
+      onChange={(e) => setCategory(e.target.value)} 
+    >
+      <option value="">Select Category</option>
+      {categories.map((cat) => (
+        <option key={cat.id} value={cat.id}>
+          {cat.categoryName}
+        </option>
+      ))}
+    </select>
+
+    <label htmlFor="availability">Availability</label>
+    <input
+      type="number"
+      id="availability"
+      placeholder="Enter available copies"
+      value={availability}
+      onChange={(e) => setAvailability(e.target.value)}
+    />
+
+    {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+
+    <div className="modal-button-group">
+      <Button name="Add" className="table-btn" />
+      <Button name="Cancel" className="table-btn" onClick={handleCloseModal} />
+    </div>
+  </form>
+</Modal>
+
     </div>
   );
 }

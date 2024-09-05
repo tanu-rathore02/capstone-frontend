@@ -1,11 +1,11 @@
+
 import React, { useState } from "react";
 import Button from "../components/Button";
-import InputField from "../components/InputField";
 import "../styles/Login.css";
+import Toast from "../components/Toast"; 
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../features/auth/authSlice";
-
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -13,6 +13,8 @@ function Login() {
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState("ADMIN");
   const [errors, setErrors] = useState({});
+  const [toastMessage, setToastMessage] = useState(""); 
+  const [showToast, setShowToast] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -25,7 +27,7 @@ function Login() {
     const newErrors = {};
 
     if (userType === "Admin") {
-      // Validate email
+     
       if (!email) {
         newErrors.email = "Email is required.";
         isValid = false;
@@ -34,7 +36,6 @@ function Login() {
         isValid = false;
       }
     } else {
-    
       if (!phoneNo) {
         newErrors.phoneNo = "Phone number is required.";
         isValid = false;
@@ -44,7 +45,6 @@ function Login() {
       }
     }
 
-   
     if (!password) {
       newErrors.password = "Password is required.";
       isValid = false;
@@ -57,23 +57,40 @@ function Login() {
     return isValid;
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+  
     if (!validateForm()) {
       return;
     }
-
-    const credentials = userType === "Admin" ? { username: email, password } : { username: phoneNo, password };
-
+  
+    const credentials = userType === "Admin" 
+      ? { username: email, password } 
+      : { username: phoneNo, password };
+  
     try {
       const result = await dispatch(loginUser(credentials)).unwrap();
+     
       localStorage.setItem("token", result.token);
-      navigate("/adminDashboard");
+      localStorage.setItem("role", userType.toUpperCase()); 
+      setToastMessage("Login successful");
+      setShowToast(true);
+  
+  
+      setTimeout(() => {
+        setShowToast(false);
+        if (userType === "Admin") {
+          navigate("/adminDashboard");
+        } else {
+          navigate("/userDashboard"); 
+        }
+      }, 3000);
     } catch (error) {
       console.error("Login failed:", error);
     }
   };
+  
 
   return (
     <div className="home-container">
@@ -99,7 +116,7 @@ function Login() {
             <div className="signin-input-field">
               {userType === "Admin" ? (
                 <>
-                  <InputField
+                  <input
                     type="email"
                     placeholder="Enter your email"
                     value={email}
@@ -109,7 +126,7 @@ function Login() {
                 </>
               ) : (
                 <>
-                  <InputField
+                  <input
                     type="tel"
                     placeholder="Enter your phone number"
                     value={phoneNo}
@@ -120,7 +137,7 @@ function Login() {
               )}
             </div>
             <div className="signin-input-field">
-              <InputField
+              <input
                 type="password"
                 placeholder="Enter your password"
                 value={password}
@@ -135,10 +152,12 @@ function Login() {
         </div>
         <div className="signin-image"></div>
       </div>
+
+     
+      <Toast message={toastMessage} show={showToast} onClose={() => setShowToast(false)} />
     </div>
   );
 }
 
 export default Login;
-
 

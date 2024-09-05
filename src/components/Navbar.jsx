@@ -1,10 +1,11 @@
+
+
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom'; // Import NavLink instead of Link
 import Logo from './Logo';
-import dashboardIcon from '../assets/dashboardIcon.svg'
+import dashboardIcon from '../assets/dashboardIcon.svg';
 import categoriesIcon from '../assets/categoriesIcon.svg';
 import usersIcon from '../assets/usersIcon.svg';
-import contactsIcon from '../assets/contactsIcon.svg';
 import booksIcon from '../assets/booksIcon.svg';
 import issuancesIcon from '../assets/issuancesIcon.svg';
 
@@ -13,27 +14,48 @@ import '../styles/Navbar.css';
 function Navbar() {
   return (
     <div className='navbar-container'>
-      <Logo/>
+      <Logo />
       <nav className='navbar'>
         <ul>
-         
           <li>
-            <Link to="/adminDashboard"><img src={dashboardIcon} alt="Dashboard" className="icon" /> Dashboard</Link>
+            <NavLink 
+              to="/adminDashboard"
+              className={({ isActive }) => (isActive ? 'active-link' : '')}
+            >
+              <img src={dashboardIcon} alt="Dashboard" className="icon" /> Dashboard
+            </NavLink>
           </li>
           <li>
-            <Link to="/categories"><img src={categoriesIcon} alt="Categories" className="icon" /> Categories</Link>
+            <NavLink 
+              to="/categories"
+              className={({ isActive }) => (isActive ? 'active-link' : '')}
+            >
+              <img src={categoriesIcon} alt="Categories" className="icon" /> Categories
+            </NavLink>
           </li>
           <li>
-            <Link to="/books"><img src={booksIcon} alt="Categories" className="icon" />Books</Link>
+            <NavLink 
+              to="/books"
+              className={({ isActive }) => (isActive ? 'active-link' : '')}
+            >
+              <img src={booksIcon} alt="Books" className="icon" />Books
+            </NavLink>
           </li>
           <li>
-            <Link to="/issuances"><img src={issuancesIcon} alt="Issuances" className="icon" />Issuances</Link>
+            <NavLink 
+              to="/issuances"
+              className={({ isActive }) => (isActive ? 'active-link' : '')}
+            >
+              <img src={issuancesIcon} alt="Issuances" className="icon" />Issuances
+            </NavLink>
           </li>
           <li>
-            <Link to="/users"><img src={usersIcon} alt="Users" className="icon" />Users</Link>
-          </li>
-          <li>
-            <Link to="/contact"><img src={contactsIcon}alt="Contact Us" className="icon" /> Contact Us</Link>
+            <NavLink 
+              to="/users"
+              className={({ isActive }) => (isActive ? 'active-link' : '')}
+            >
+              <img src={usersIcon} alt="Users" className="icon" />Users
+            </NavLink>
           </li>
         </ul>
       </nav>

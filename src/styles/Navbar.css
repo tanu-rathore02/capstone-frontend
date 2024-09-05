@@ -1,10 +1,9 @@
-
 .navbar-container {
-  width: 200px;
+  /* width: 200px; */
   height: 100vh;
   background-color: #3a3043;
-  position: fixed;
-  top: 0;
+  /* position: fixed; */
+  /* top: 0; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -49,4 +48,12 @@
   margin-right: 10px;
   margin-left: 10px;
   vertical-align: middle;
+}
+
+/* Active link styling */
+.active-link {
+  text-decoration: underline;
+  color: #ffeb3b; /* You can change this to the color you prefer */
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.1); /* Optional: highlight background */
 }

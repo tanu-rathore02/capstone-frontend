@@ -1,8 +1,13 @@
+
+
 .card-container {
     align-items: center;
-    padding: 20px;
-    margin: 10px 0; 
-    width: 220px;
+    padding: 5%;
+    /* margin: 10px 0;  */
+    /* width: 200px; */
+  width: 90%;
+
+    /* gap: 2%; */
     height: 180px;
     border-radius: 8px;
     background-color: #E2D6DF;

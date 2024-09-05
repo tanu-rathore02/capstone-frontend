@@ -5,7 +5,7 @@
   padding: 12px 24px;
   text-align: center;
   font-size: 16px;
-  margin: 0 10px;
+  /* margin: 0 10px; */
   cursor: pointer;
   border-radius: 20px;
   font-weight: bold;
@@ -54,7 +54,7 @@
   color: white; 
   border: none;
   opacity: 1;
-  padding: 6px 12px; 
+  padding: 3px 8px; 
   text-align: center;
   font-size: 13px; 
   cursor: pointer;
@@ -75,7 +75,38 @@
 
 .button.table-component td div {
   display: flex;
-  justify-content: flex-start; 
+  justify-content: center; 
   align-items: center;
   gap: 8px;
 }
+
+
+button.search-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #6a4c93;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+button.search-button:hover {
+  background-color: #543a74;
+}
+
+button.icon-btn {
+ background: transparent;
+  padding: 0;
+  opacity: 1;
+  background: none;
+  border: none;
+
+}
+
+button.icon-btn:hover {
+  background-color: #796987;
+}
+
+

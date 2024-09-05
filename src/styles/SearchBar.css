@@ -1,11 +1,8 @@
 .search-bar {
-  width: 100%;
-  max-width: 400px;
-  padding: 10px 20px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 25px; 
-  outline: none;
-  transition: border-color 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
 }
 
+.search-bar .table-btn {
+  margin-left: 8px; /* Adjust spacing between search input and button as needed */
+}

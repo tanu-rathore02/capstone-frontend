@@ -94,37 +94,38 @@ function Users() {
         title="Add User"
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        height="300px"
-        width="350px"
+        height="500px"
+        width="400px"
       >
         <form onSubmit={handleUserSubmit} className="user-form">
+        <label htmlFor="Nname">Username</label>
           <input
             type="text"
-            placeholder="Name"
+            
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
-          
+           <label htmlFor="email">Email</label>
           <input
             type="email" 
-            placeholder="Email"
+           
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          
+           <label htmlFor="mobileNumber">Mobile Number</label>
           <input
             type="tel" 
-            placeholder="Mobile Number"
+          
             value={mobileNumber}
             onChange={(e) => setMobileNumber(e.target.value)}
             required
           />
-          
+           <label htmlFor="password">Password</label>
           <input
             type="password" 
-            placeholder="Password"
+           
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -132,7 +133,11 @@ function Users() {
           
           {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
           
-          <Button type="submit" name="Add" className="page-btn" />
+          <div className='modal-button-group'>
+            <Button type="submit" name="Add" className="table-btn" />
+          <Button type="submit" name="Cancel" className="table-btn"  onClick={handleCloseModal}/>
+          </div>
+          
         </form>
       </Modal>
     </div>

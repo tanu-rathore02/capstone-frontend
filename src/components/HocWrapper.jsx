@@ -1,14 +1,19 @@
 
 import React from 'react';
+import '../styles/HocWrapper.css'
 
 function HocWrapper(Navbar, Header) {
   return function (Component) {  
     return function WrappedComponent(props) {
       return (
-        <div>
-          <Header />
+        <div className='hoc-container'>
+          <div className='nav-container'>
           <Navbar />
-          <div className="fixed-content">
+          </div>
+          <div className="header-container">
+            <Header />
+          </div>
+          <div className='component-container'>
             <Component {...props} />
           </div>
         </div>

@@ -1,16 +1,14 @@
 
    .table-container {
     width: 100%;
-    margin-top: 20px; 
-    display: flex;
-    flex-direction: column; 
-    align-items: center; 
+    /* padding-left: 0.5%; */
   }
   
   .table-component {
-    width: 90%; 
+    width: 100%; 
     border-collapse: collapse;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    /* table-lay?out: fixed; */
   }
   
   .table-component thead {
@@ -18,10 +16,20 @@
     color: #fff;
   }
   
-  .table-component th, .table-component td {
+  .table-component th {
     padding: 12px 15px;
     text-align: left;
   }
+
+  .table-component td {
+    overflow: hidden;
+    overflow-x: ellipsis;
+    padding: 12px 15px;
+    text-align: left;
+  }
+
+  
+  
   
   .table-component tbody tr {
     background-color: #E2D6DF; 
@@ -32,15 +40,7 @@
     background-color: #fffdfe; 
   }
   
-  .table-component th {
-    white-space: nowrap;
-  }
   
-  .table-component td {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
   
   .table-component td div {
     display: flex;
@@ -48,6 +48,43 @@
     align-items: center; 
     gap: 10px;
   }
+  
+/* 
+   .table-component {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 5px;
+    overflow: hidden;
+    color: #A47551;
+    text-align: center;
+    outline: 2px solid #a4755141;
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    table-layout: fixed;
+  }
+  .table-component th {
+    padding: 1%;
+    border-bottom: 1px solid #a4755141;
+    font-size: 1rem;
+  }
+  .table-component td {
+    border-top: 1px solid #a4755141;
+    padding: 1%;
+    text-align: left;
+    font-size: 1rem;
+  }
+  .table-component th {
+    text-align: center;
+    background-color: #F6EEE0;
+    text-align: left;
+  }
+   */
+  
+  
+  
+  
+  
   
 
   .pagination-controls {
@@ -81,5 +118,49 @@
   
   .pagination-controls button:hover:not(:disabled) {
     background-color: #6d4b78; 
+  }
+ 
+  .dropdown-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-menu {
+    display: flex;
+    flex-direction: column; /* Ensures the dropdown opens vertically */
+    position: absolute;
+    top: 100%; /* Places it directly below the button */
+    left: 0;   /* Aligns the dropdown to the left of the button */
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 8px 0;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    min-width: 150px;
+  }
+  
+  /* Dropdown Button Styling */
+  .dropdown-btn {
+    width: 100%; /* Ensures each button takes the full width */
+    padding: 10px 15px;
+    background-color: #fff;
+    border: none;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .dropdown-btn:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Three Dots Button */
+  .three-dots-btn {
+    background-color: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
   }
   

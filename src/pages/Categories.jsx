@@ -14,7 +14,7 @@ function Categories() {
   const [categoryName, setCategoryName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [refresh, setRefresh] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(""); 
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleButtonClick = () => {
     setIsModalOpen(true);
@@ -55,7 +55,7 @@ function Categories() {
   };
 
   const handleSearch = (term) => {
-    setSearchTerm(term); 
+    setSearchTerm(term);
   };
 
   return (
@@ -74,18 +74,25 @@ function Categories() {
         title="Add Category"
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        height="200px"
+        height="230px"
         width="300px"
       >
         <form onSubmit={handleCategorySubmit}>
+          <label htmlFor="categoryName">Category Name</label>
           <input
             type="text"
-            placeholder="Category Name"
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
           />
           {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-          <Button name="Add" className="page-btn" />
+          <div className="modal-button-group">
+            <Button name="Add" className="table-btn" />
+            <Button
+              name="Cancel"
+              className="table-btn"
+              onClick={handleCloseModal}
+            />
+          </div>
         </form>
       </Modal>
     </div>

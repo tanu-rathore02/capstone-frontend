@@ -8,7 +8,7 @@ import Searchbar from "../components/Searchbar";
 import Button from "../components/Button";
 import axios from "axios";
 import Modal from "../components/Modal";
-import InputField from "../components/InputField";
+
 
 function Issuances() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,8 +17,8 @@ function Issuances() {
   const [issuanceType, setIssuanceType] = useState('');
   const [users, setUsers] = useState([]); // State to hold users in dropdown
   const [books, setBooks] = useState([]); // State to hold books in dropdown
-  const [username, setUsername] = useState('');
-  const [bookname, setBookname] = useState('');
+  const [username, setUsername] = useState( );
+  const [bookname, setBookname] = useState( );
   const [errorMessage, setErrorMessage] = useState('');
   const [refresh, setRefresh] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); 
@@ -46,7 +46,7 @@ function Issuances() {
             Authorization: token,
           },
         });
-        setBooks(response.data); // Set books in state
+        setBooks(response.data); 
       } catch (error) {
         console.error("Error fetching books", error);
       }
@@ -65,8 +65,8 @@ function Issuances() {
     setStatus('');
     setReturnDate('');
     setIssuanceType('');
-    setBookname('');
-    setUsername('');
+    setBookname();
+    setUsername();
     setErrorMessage('');
   };
 
@@ -74,8 +74,12 @@ function Issuances() {
     e.preventDefault();
 
     
-    const formattedStatus = status.toUpperCase(); // Convert to uppercase if that's what the backend expects
-    const formattedIssuanceType = issuanceType.replace(/\s+/g, '-').toUpperCase(); // Replace spaces with hyphens and convert to uppercase
+    const formatDateTime = (dateString, time = '15:30:00') => {
+      return dateString + 'T' + time;  // Concatenates 'T' with the time part
+    };
+    const formattedStatus = status.toUpperCase();
+    const formattedIssuanceType = issuanceType.replace(/\s+/g, '-').toUpperCase(); 
+    const formattedReturnDate = formatDateTime(returnDate); 
 
     console.log({
       userId: username,
@@ -92,7 +96,7 @@ function Issuances() {
         bookId: bookname,
         status: formattedStatus,
         issuanceType: formattedIssuanceType,
-        returnDate: returnDate,
+        returnDate: formattedReturnDate,
       };
       const response = await axios.post(
         "http://localhost:8080/api/issuances/createIssuance",
@@ -114,6 +118,7 @@ function Issuances() {
   };
 
   
+  
   const handleSearch = (term) => {
     setSearchTerm(term); 
   };
@@ -129,14 +134,15 @@ function Issuances() {
         title="Add Issuance"
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        height="350px"
-        width="400px"
+        height="500px"
+        width="450px"
       >
         <form onSubmit={handleIssuanceSubmit}>
+        <label htmlFor="name">Username</label>
           <select
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            required
+            
           >
             <option value="">Select User</option>
             {users.map((user) => (
@@ -145,10 +151,11 @@ function Issuances() {
               </option>
             ))}
           </select>
+          <label htmlFor="book">Book</label>
           <select
             value={bookname}
             onChange={(e) => setBookname(e.target.value)}
-            required
+           
           >
             <option value="">Select Book</option>
             {books.map((book) => (
@@ -157,12 +164,13 @@ function Issuances() {
               </option>
             ))}
           </select>
-          <InputField
+          <label htmlFor="returnDate">Return Date</label>
+          <input
             type="date"
             placeholder="Return Date"
             value={returnDate}
             onChange={(e) => setReturnDate(e.target.value)}
-            required
+            
           />
           <div>
             <label>Status:</label>
@@ -171,7 +179,7 @@ function Issuances() {
               value="ISSUED"
               checked={status === 'ISSUED'}
               onChange={(e) => setStatus(e.target.value)}
-              required
+             
             />
             <label>ISSUED</label>
             <input
@@ -179,7 +187,7 @@ function Issuances() {
               value="RETURNED"
               checked={status === 'RETURNED'}
               onChange={(e) => setStatus(e.target.value)}
-              required
+             
             />
             <label>RETURNED</label>
           </div>
@@ -190,7 +198,7 @@ function Issuances() {
               value="IN-HOUSE"
               checked={issuanceType === 'IN-HOUSE'}
               onChange={(e) => setIssuanceType(e.target.value)}
-              required
+             
             />
             <label>In House</label>
             <input
@@ -198,16 +206,19 @@ function Issuances() {
               value="TAKE-AWAY"
               checked={issuanceType === 'TAKE-AWAY'}
               onChange={(e) => setIssuanceType(e.target.value)}
-              required
+             
             />
             <label>Take Away</label>
           </div>
-          <Button name="Add" className="page-btn" />
+          <div className="modal-button-group">
+             <Button name="Add" className="table-btn" />
           <Button
             name="Cancel"
-            className="page-btn"
+            className="table-btn"
             onClick={handleCloseModal}
           />
+          </div>
+         
         </form>
       </Modal>
     </div>

@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import '../styles/SearchBar.css';
-import InputField from './InputField';
-import Button from './Button';
+import { useState } from 'react';
+import '../styles/SearchBar.css'
+import Button from './Button'; 
 
 function Searchbar({ onSearch }) {
   const [searchInput, setSearchInput] = useState('');
@@ -22,14 +21,14 @@ function Searchbar({ onSearch }) {
 
   return (
     <div className="search-bar">
-      <InputField
+      <input
         type="text"
         placeholder="Search"
         value={searchInput}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
       />
-      <Button name= "Search" className= "table-btn" onClick={handleSearch}/> 
+      <Button name="Search" className="table-btn" onClick={handleSearch} />
     </div>
   );
 }

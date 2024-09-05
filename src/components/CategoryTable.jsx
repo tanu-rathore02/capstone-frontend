@@ -23,7 +23,7 @@ function CategoryTable({ showPagination = true, refresh, searchTerm }) {
         },
         params: {
           page: currentPage,
-          size: 10,
+          size: 5,
           sortBy: "id",
           sortDir: "asc",
           search: searchTerm || "", 
@@ -32,7 +32,7 @@ function CategoryTable({ showPagination = true, refresh, searchTerm }) {
 
       setData(
         response.data.content.map((category, index) => ({
-          sno: index + 1 + currentPage * 10,
+          sno: index + 1 + currentPage *5,
           categoryName: category.categoryName,
           id: category.id,
         }))
@@ -150,13 +150,17 @@ function CategoryTable({ showPagination = true, refresh, searchTerm }) {
         onClose={() => setIsEditModalOpen(false)}
       >
         <form onSubmit={(e) => { e.preventDefault(); handleUpdateCategory(); }}>
-          <InputField
+        <label htmlFor="categoryName">Category Name</label>
+          <input
             type="text"
-            placeholder="Category Name"
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
           />
-          <Button name="Update" className="page-btn" />
+          <div className="modal-button-group"> 
+            <Button name="Update" className="table-btn" />
+          <Button name="Cancel" className="table-btn" onClick={() => setIsEditModalOpen(false)} />
+          </div>
+          
         </form>
       </Modal>
       <Modal
@@ -165,8 +169,11 @@ function CategoryTable({ showPagination = true, refresh, searchTerm }) {
         onClose={() => setIsDeleteModalOpen(false)}
       >
         <p style={{ color: "black" }}>Are you sure you want to delete this category?</p>
-        <Button name="Delete" className="page-btn" onClick={handleConfirmDelete} />
-        <Button name="Cancel" className="page-btn" onClick={() => setIsDeleteModalOpen(false)} />
+        <div className="modal-button-group"> 
+          <Button name="Delete" className="table-btn" onClick={handleConfirmDelete} />
+        <Button name="Cancel" className="table-btn" onClick={() => setIsDeleteModalOpen(false)} />
+        </div>
+        
       </Modal>
     </div>
   );
