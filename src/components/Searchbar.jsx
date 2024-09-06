@@ -1,21 +1,34 @@
 import { useState } from 'react';
-import '../styles/SearchBar.css'
-import Button from './Button'; 
+import '../styles/SearchBar.css';
+import SearchIcon from '../assets/searchIcon.svg';
 
 function Searchbar({ onSearch }) {
   const [searchInput, setSearchInput] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleInputChange = (e) => {
-    setSearchInput(e.target.value);
-  };
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchInput(value);
 
-  const handleSearch = () => {
-    onSearch(searchInput);
+    if (value.length === 0) {
+      // If input is cleared, display original data
+      setErrorMessage('');
+      if (onSearch) {
+        onSearch('');
+      }
+    } else if (value.length < 3) {
+      setErrorMessage('Search term must be at least 3 characters long');
+    } else {
+      setErrorMessage('');
+      if (onSearch) {
+        onSearch(value);
+      }
+    }
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
+    if (e.key === 'Enter' && searchInput.length >= 3) {
+      onSearch(searchInput);
     }
   };
 
@@ -25,10 +38,11 @@ function Searchbar({ onSearch }) {
         type="text"
         placeholder="Search"
         value={searchInput}
-        onChange={handleInputChange}
+        onChange={handleSearch}
         onKeyDown={handleKeyDown}
       />
-      <Button name="Search" className="table-btn" onClick={handleSearch} />
+      <img src={SearchIcon} alt="search" className="search-icon" />
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
     </div>
   );
 }

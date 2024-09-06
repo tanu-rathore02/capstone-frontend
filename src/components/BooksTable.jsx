@@ -9,10 +9,6 @@ import deleteIcon from "../assets/deleteIcon.svg";
 import assignIcon from "../assets/assignIcon.svg";
 import historyIcon from "../assets/historyIcon.svg"
 
-
-
-// import apiManager from "../api/apiManager";
-
 function BooksTable({ showPagination = true, refresh, searchTerm }) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -44,18 +40,18 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
           headers: { Authorization: token },
           params: {
             page: currentPage,
-            size: 10,
+            size: 8,
             sortBy: "id",
             sortDir: "asc",
             search: searchTerm || "",
           },
         }
       );
-      //const response = await apiManager.getAllBooks(bookId);
+
       setData(
         response.data.content.map((book, index) => ({
           id: book.id,
-          sno: index + 1 + currentPage * 10,
+          sno: index + 1 + currentPage * 8,
           title: book.title,
           author: book.author,
           availability: book.availability,

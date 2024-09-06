@@ -5,11 +5,10 @@ import HocWrapper from "../components/HocWrapper";
 import Button from "../components/Button";
 import Searchbar from "../components/Searchbar";
 import BooksTable from '../components/BooksTable';
-// import apiManager from '../api/apiManager'
 import '../styles/Pages.css';
 import axios from "axios";
 import Modal from "../components/Modal";
-import InputField from "../components/InputField";
+
 
 
 function Books() {

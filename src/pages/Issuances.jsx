@@ -75,7 +75,7 @@ function Issuances() {
 
     
     const formatDateTime = (dateString, time = '15:30:00') => {
-      return dateString + 'T' + time;  // Concatenates 'T' with the time part
+      return dateString + 'T' + time; 
     };
     const formattedStatus = status.toUpperCase();
     const formattedIssuanceType = issuanceType.replace(/\s+/g, '-').toUpperCase(); 
@@ -126,7 +126,7 @@ function Issuances() {
   return (
     <div className="pages-container">
       <div className="controls-container">
-        <Searchbar onClick={handleSearch}/>
+        {/* <Searchbar onClick={handleSearch}/> */}
         <Button name="Add Issuance" className="page-btn" onClick={handleButtonClick} />
       </div>
       <IssuancesTable showPagination={true} refresh={refresh} searchTerm= {searchTerm} />

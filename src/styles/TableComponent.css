@@ -48,44 +48,6 @@
     align-items: center; 
     gap: 10px;
   }
-  
-/* 
-   .table-component {
-    width: 100%;
-    border-collapse: collapse;
-    border-radius: 5px;
-    overflow: hidden;
-    color: #A47551;
-    text-align: center;
-    outline: 2px solid #a4755141;
-    font-family: "Roboto", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-    table-layout: fixed;
-  }
-  .table-component th {
-    padding: 1%;
-    border-bottom: 1px solid #a4755141;
-    font-size: 1rem;
-  }
-  .table-component td {
-    border-top: 1px solid #a4755141;
-    padding: 1%;
-    text-align: left;
-    font-size: 1rem;
-  }
-  .table-component th {
-    text-align: center;
-    background-color: #F6EEE0;
-    text-align: left;
-  }
-   */
-  
-  
-  
-  
-  
-  
 
   .pagination-controls {
     margin-top: 15px;
@@ -127,10 +89,9 @@
   
   .dropdown-menu {
     display: flex;
-    flex-direction: column; /* Ensures the dropdown opens vertically */
+    flex-direction: column; 
     position: absolute;
-    top: 100%; /* Places it directly below the button */
-    left: 0;   /* Aligns the dropdown to the left of the button */
+    left: 0;   
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     padding: 8px 0;
@@ -139,9 +100,9 @@
     min-width: 150px;
   }
   
-  /* Dropdown Button Styling */
+  
   .dropdown-btn {
-    width: 100%; /* Ensures each button takes the full width */
+    width: 100%; 
     padding: 10px 15px;
     background-color: #fff;
     border: none;
@@ -154,8 +115,7 @@
   .dropdown-btn:hover {
     background-color: #f1f1f1;
   }
-  
-  /* Three Dots Button */
+
   .three-dots-btn {
     background-color: transparent;
     border: none;

@@ -1,14 +1,15 @@
-
 import React from 'react';
-import '../styles/HocWrapper.css'
+import '../styles/HocWrapper.css';
 
 function HocWrapper(Navbar, Header) {
   return function (Component) {  
     return function WrappedComponent(props) {
+      const role = localStorage.getItem('role'); 
+
       return (
         <div className='hoc-container'>
           <div className='nav-container'>
-          <Navbar />
+            <Navbar role={role} /> 
           </div>
           <div className="header-container">
             <Header />

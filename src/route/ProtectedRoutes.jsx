@@ -1,11 +1,4 @@
-// import { Navigate, Outlet } from 'react-router-dom';
 
-// const ProtectedRoutes = () => {
-//   const token = localStorage.getItem("token");
-//   return token ? <Outlet /> : <Navigate to="/" />;
-// };
-
-// export default ProtectedRoutes;
 
 
 import { Navigate, Outlet } from 'react-router-dom';
@@ -13,6 +6,12 @@ import { Navigate, Outlet } from 'react-router-dom';
 const ProtectedRoutes = ({ allowedRoles }) => {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
+
+
+  console.log('Token:', token);
+  console.log('Role:', role);
+  console.log('Allowed Roles:', allowedRoles);
+
 
   if (!token) {
     // If no token is present, redirect to login

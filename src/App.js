@@ -13,39 +13,6 @@ import ProtectedRoutes from "./route/ProtectedRoutes";
 import IssuanceHistoryByUser from "./components/IssuanceHistoryByUser";
 import IssuanceHistoryByBook from "./components/IssuanceHistoryByBook";
 
-// function App() {
-//   return (
-//     <Provider store={store}>
-//       <Router>
-//         <div>
-//           <Routes>
-//             <Route path="/" element={<Login />} />
-
-//             <Route element={<ProtectedRoutes />}>
-//               <Route path="/adminDashboard" element={<AdminDashboard />} />
-//               <Route path="/categories" element={<Categories />} />
-//               <Route path="/issuances" element={<Issuances />} />
-//               <Route path="/books" element={<Books />} />
-
-//               <Route path="/users" element={<Users />} />
-//               <Route
-//                 path="/user/:userId/issuanceHistory"
-//                 element={<IssuanceHistoryByUser />}
-//               />
-//               <Route
-//                 path="/book/:bookId/issuanceHistory"
-//                 element={<IssuanceHistoryByBook />}
-//               />
-//             </Route>
-//           </Routes>
-//         </div>
-//       </Router>
-//     </Provider>
-//   );
-// }
-
-// export default App;
-
 function App() {
   return (
     <Provider store={store}>

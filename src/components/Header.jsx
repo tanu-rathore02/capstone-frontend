@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import Button from './Button';
-import Modal from './Modal'; // Import the Modal component
+import Modal from './Modal'; 
 import '../styles/Header.css';
 import { useNavigate } from 'react-router-dom';
 
 function Header() {
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false); 
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -14,26 +14,26 @@ function Header() {
   };
 
   const openModal = () => {
-    setIsModalOpen(true); // Open the modal when "Sign-out" is clicked
+    setIsModalOpen(true); 
   };
 
   const closeModal = () => {
-    setIsModalOpen(false); // Close the modal without logging out
+    setIsModalOpen(false);
   };
 
   const confirmLogout = () => {
     handleLogout();
-    setIsModalOpen(false); // Close the modal after logout
+    setIsModalOpen(false); 
   };
 
   return (
     <div className="header">
-      <h1>Welcome Admin</h1>
+      <h1>Welcome</h1>
       <div className="header-btn">
         <Button name="Sign-out" className="form-btn" onClick={openModal} />
       </div>
 
-      {/* Modal for logout confirmation */}
+  
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}

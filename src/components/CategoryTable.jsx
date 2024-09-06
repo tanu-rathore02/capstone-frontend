@@ -1,9 +1,10 @@
+
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import TableComponent from "./TableComponent";
 import Modal from "./Modal";
 import Button from "./Button";
-import InputField from "./InputField";
 
 function CategoryTable({ showPagination = true, refresh, searchTerm }) {
   const [data, setData] = useState([]);
@@ -11,8 +12,11 @@ function CategoryTable({ showPagination = true, refresh, searchTerm }) {
   const [totalPages, setTotalPages] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryName, setCategoryName] = useState("");
+  const [message, setMessage] = useState(""); 
+  const [isError, setIsError] = useState(false); 
 
   const fetchData = async () => {
     try {
@@ -23,7 +27,7 @@ function CategoryTable({ showPagination = true, refresh, searchTerm }) {
         },
         params: {
           page: currentPage,
-          size: 5,
+          size: 8,
           sortBy: "id",
           sortDir: "asc",
           search: searchTerm || "", 
@@ -32,7 +36,7 @@ function CategoryTable({ showPagination = true, refresh, searchTerm }) {
 
       setData(
         response.data.content.map((category, index) => ({
-          sno: index + 1 + currentPage *5,
+          sno: index + 1 + currentPage * 8,
           categoryName: category.categoryName,
           id: category.id,
         }))
@@ -47,44 +51,52 @@ function CategoryTable({ showPagination = true, refresh, searchTerm }) {
     fetchData();
   }, [currentPage, searchTerm, refresh]);
 
- 
   const handleEdit = (category) => {
     setSelectedCategory(category);
     setCategoryName(category.categoryName);
     setIsEditModalOpen(true);
+    setMessage(""); 
   };
 
   const handleDelete = (category) => {
     setSelectedCategory(category);
-    setIsDeleteModalOpen(true);
+    setIsConfirmDeleteModalOpen(true);
   };
 
   const handleConfirmDelete = async () => {
-    const confirmDeletion = window.confirm(
-      "Deleting this category will also delete all associated books. Are you sure you want to proceed?"
-    );
+    try {
+      const token = localStorage.getItem("token");
 
-    if (confirmDeletion) {
-      try {
-        const token = localStorage.getItem("token");
+      await axios.delete(`http://localhost:8080/api/categories/deleteCategory/${selectedCategory.id}`, {
+        headers: { Authorization: token },
+      });
 
-        await axios.delete(`http://localhost:8080/api/categories/deleteCategory/${selectedCategory.id}`, {
-          headers: { Authorization: token },
-        });
+      setMessage("Category deleted successfully!"); 
+      setIsError(false);
 
+      // Open success modal and then close it after some delay
+      setIsDeleteModalOpen(true);
+      setTimeout(() => {
         setIsDeleteModalOpen(false);
+        setIsConfirmDeleteModalOpen(false);
         setSelectedCategory(null);
-        fetchData();
-      } catch (error) {
-        console.error("Error deleting category", error);
-      }
-    } else {
-      setIsDeleteModalOpen(false);
-      setSelectedCategory(null);
+      }, 2000); 
+
+      fetchData();
+    } catch (error) {
+      setMessage("Error deleting category!");
+      setIsError(true);
+      console.error("Error deleting category", error);
     }
   };
 
   const handleUpdateCategory = async () => {
+    if (categoryName.trim() === "") {
+      setMessage("Category name cannot be empty!"); 
+      setIsError(true);
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       await axios.put(
@@ -93,11 +105,20 @@ function CategoryTable({ showPagination = true, refresh, searchTerm }) {
         { headers: { Authorization: token } }
       );
 
-      setIsEditModalOpen(false);
-      setSelectedCategory(null);
-      setCategoryName("");
+      setMessage("Category updated successfully!"); 
+      setIsError(false);
+
+      // Open success modal and then close it after some delay
+      setTimeout(() => {
+        setIsEditModalOpen(false);
+        setSelectedCategory(null);
+        setCategoryName("");
+      }, 2000); 
+
       fetchData();
     } catch (error) {
+      setMessage("Error updating category!"); 
+      setIsError(true);
       console.error("Error updating category", error);
     }
   };
@@ -127,53 +148,82 @@ function CategoryTable({ showPagination = true, refresh, searchTerm }) {
       setCurrentPage(currentPage + 1);
     }
   };
-
+  
   return (
     <div className="table-container">
-      <TableComponent columns={columns} data={data} />
-      {showPagination && (
-        <div className="pagination-controls">
-          <button onClick={handlePreviousPage} disabled={currentPage === 0}>
-            Previous
-          </button>
-          <span>
-            Page {currentPage + 1} of {totalPages}
-          </span>
-          <button onClick={handleNextPage} disabled={currentPage === totalPages - 1}>
-            Next
-          </button>
-        </div>
+      {data.length > 0 ? (
+        <>
+          <TableComponent columns={columns} data={data} />
+          {showPagination && (
+            <div className="pagination-controls">
+              <button onClick={handlePreviousPage} disabled={currentPage === 0}>
+                Previous
+              </button>
+              <span>
+                Page {currentPage + 1} of {totalPages}
+              </span>
+              <button onClick={handleNextPage} disabled={currentPage === totalPages - 1}>
+                Next
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        <p className="no-data-message">No data available</p>
       )}
+
       <Modal
         title="Edit Category"
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
       >
-        <form onSubmit={(e) => { e.preventDefault(); handleUpdateCategory(); }}>
-        <label htmlFor="categoryName">Category Name</label>
+        {message && (
+          <p className={isError ? "error-message" : "success-message"}>{message}</p>
+        )}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleUpdateCategory();
+          }}
+        >
+          <label htmlFor="categoryName">Category Name</label>
           <input
             type="text"
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
           />
-          <div className="modal-button-group"> 
+          <div className="modal-button-group">
             <Button name="Update" className="table-btn" />
-          <Button name="Cancel" className="table-btn" onClick={() => setIsEditModalOpen(false)} />
+            <Button name="Cancel" className="table-btn" onClick={() => setIsEditModalOpen(false)} />
           </div>
-          
         </form>
       </Modal>
+
+      <Modal
+        title="Confirm Deletion"
+        isOpen={isConfirmDeleteModalOpen}
+        onClose={() => setIsConfirmDeleteModalOpen(false)}
+      >
+        <p style={{ color: "black" }}>
+          Deleting this category will also delete all associated books. Are you sure you want to proceed?
+        </p>
+        <div className="modal-button-group">
+          <Button name="Delete" className="table-btn" onClick={handleConfirmDelete} />
+          <Button name="Cancel" className="table-btn" onClick={() => setIsConfirmDeleteModalOpen(false)} />
+        </div>
+      </Modal>
+
       <Modal
         title="Delete Category"
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
       >
-        <p style={{ color: "black" }}>Are you sure you want to delete this category?</p>
-        <div className="modal-button-group"> 
-          <Button name="Delete" className="table-btn" onClick={handleConfirmDelete} />
-        <Button name="Cancel" className="table-btn" onClick={() => setIsDeleteModalOpen(false)} />
+        {message && (
+          <p className={isError ? "error-message" : "success-message"}>{message}</p>
+        )}
+        <div className="modal-button-group">
+          <Button name="Close" className="table-btn" onClick={() => setIsDeleteModalOpen(false)} />
         </div>
-        
       </Modal>
     </div>
   );

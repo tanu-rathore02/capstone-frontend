@@ -38,7 +38,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
         },
         params: {
           page: currentPage,
-          size: 10,
+          size: 8,
           sortBy: "id",
           sortDir: "asc",
           search: searchTerm || "",
@@ -47,7 +47,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
 
       setData(
         response.data.content.map((user, index) => ({
-          sno: index + 1 + currentPage * 10,
+          sno: index + 1 + currentPage * 8,
           id: user.id,
           name: user.name,
           mobileNumber: user.mobileNumber,
@@ -159,7 +159,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:8080/api/user/${selectedUser.mobileNumber}`,
+        `http://localhost:8080/api/user/updateUser/${selectedUser.mobileNumber}`,
         {
           name,
           mobileNumber,
@@ -197,7 +197,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
     try {
       const token = localStorage.getItem("token");
       await axios.delete(
-        `http://localhost:8080/api/user/${selectedUser.mobileNumber}`,
+        `http://localhost:8080/api/user/deleteUser/${selectedUser.mobileNumber}`,
         {
           headers: { Authorization: token },
         }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import TableComponent from './TableComponent';
+import '../styles/Pages.css'
 
 function IssuanceHistoryByUser() {
   const { bookId } = useParams(); 
@@ -32,8 +33,7 @@ function IssuanceHistoryByUser() {
         setData([]);
       }
    
-      // console.error('Error fetching issuance history:', error);
-      // setData([]);
+     
    
   };
 
