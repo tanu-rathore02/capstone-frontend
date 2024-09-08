@@ -4,7 +4,7 @@ export const LOGIN_API = "login";
 export const CREATE_CATEGORY = "categories/createCategory";
 export const GET_CATEGORY = "categories/allCategories";
 export const UPDATE_CATEGORY ="categories/updateCategory/";
-export const DELETE_CATEGORY ="category/deleteCategory/";
+export const DELETE_CATEGORY ="categories/deleteCategory/";
 export const GET_ALL_CATEGORY = "categories/allForDropDown";
 
 export const GET_BOOK = "books/allBooks";
@@ -25,6 +25,11 @@ export const UPDATE_ISSUANCE = "issuances/updateIssuance/";
 export const DELETE_ISSUANCE = "issuances/deleteIssuance/";
 export const GET_ISSUANCE_BY_BOOK = "issuances/book/"
 export const GET_ISSUANCE_BY_USER = "issuances/user/"
+
+export const GET_USER_COUNT = "user-count";
+export const GET_BOOK_COUNT = "books/title-count";
+export const GET_CATEGORY_COUNT = "categories/categoryCount";
+export const GET_INHOUSE_READER_COUNT = "issuances/type/count";
 
 
 

@@ -1,13 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import Button from "./Button";
 import Modal from "./Modal";
 import TableComponent from "./TableComponent";
 import editIcon from "../assets/editIcon.svg";
 import deleteIcon from "../assets/deleteIcon.svg";
 import assignIcon from "../assets/assignIcon.svg";
-import historyIcon from "../assets/historyIcon.svg"
+import historyIcon from "../assets/historyIcon.svg";
+import {
+  GET_BOOK,
+  UPDATE_BOOK,
+  DELETE_BOOK,
+  GET_ALL_CATEGORY,
+  GET_ALL_USER,
+  CREATE_ISSUANCE,
+} from "../api/ApiConstants";
+import {
+  getRequest,
+  putRequest,
+  deleteRequest,
+  postRequest,
+} from "../api/ApiManager";
 
 function BooksTable({ showPagination = true, refresh, searchTerm }) {
   const [data, setData] = useState([]);
@@ -28,75 +41,118 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
   const [availability, setAvailability] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [categories, setCategories] = useState([]);
-  const [errorMessage, setErrorMessage] = useState();
+  const [message, setMessage] = useState();
+  const [isError, setIsError] = useState(false);
+
   const navigate = useNavigate();
 
-  const fetchData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `http://localhost:8080/api/books/allBooks`,
-        {
-          headers: { Authorization: token },
-          params: {
-            page: currentPage,
-            size: 8,
-            sortBy: "id",
-            sortDir: "asc",
-            search: searchTerm || "",
-          },
+  const fetchData = () => {
+    getRequest(
+      `${GET_BOOK}?page=${currentPage}&size=8&sortBy=id&sortDir=desc&search=${searchTerm || ""}`,
+      (response) => {
+        if (response?.status === 200 || 201) {
+          setData(
+            response.data.content.map((book, index) => ({
+              id: book.id,
+              sno: index + 1 + currentPage * 8,
+              title: book.title,
+              author: book.author,
+              availability: book.availability,
+              category: book.categories?.categoryName || "N/A",
+            }))
+          );
+          setTotalPages(response.data.totalPages);
+        } else {
+          console.error("Error fetching the books", response?.error);
         }
-      );
-
-      setData(
-        response.data.content.map((book, index) => ({
-          id: book.id,
-          sno: index + 1 + currentPage * 8,
-          title: book.title,
-          author: book.author,
-          availability: book.availability,
-          category: book.categories?.categoryName || "N/A",
-        }))
-      );
-      setTotalPages(response.data.totalPages);
-    } catch (error) {
-      console.error("Error fetching books", error);
-    }
+      }
+    );
   };
 
   useEffect(() => {
     fetchData();
   }, [currentPage, searchTerm, refresh]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          "http://localhost:8080/api/allUsersForDropDown",
-          {
-            headers: {
-              Authorization: token,
-            },
-          }
-        );
+  const fetchUsers = () => {
+    getRequest(`${GET_ALL_USER}`, (response) => {
+      if (response?.status === 200 || 201) {
         setUsers(response.data);
-      } catch (error) {
-        console.error("Error fetching books", error);
+      } else {
+        console.error("Error fetching users", response?.error);
       }
-    };
+    });
+  };
+
+  useEffect(() => {
     fetchUsers();
   }, [isAssignModalOpen]);
+
+  useEffect(() => {
+    const fetchCategories = () => {
+      getRequest(GET_ALL_CATEGORY, (response) => {
+        if (response?.status === 200) {
+          setCategories(response.data);
+        } else {
+          console.error("Error fetching categories", response?.data);
+        }
+      });
+    };
+
+    fetchCategories();
+  }, [isEditModalOpen]);
+
+  // Validation Functions
+  const validateEditForm = () => {
+    const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;
+
+    if (!title || !author || !availability || !categoryId) {
+      setMessage("Please fill all the fields!");
+      setIsError(true);
+      return false;
+    }
+    if (specialCharacterRegex.test(title) || specialCharacterRegex.test(author)) {
+      setMessage("Title and Author cannot contain special characters!");
+      setIsError(true);
+      return false;
+    }
+    if (availability < 0) {
+      setMessage("Availability cannot be a negative number!");
+      setIsError(true);
+      return false;
+    }
+    return true;
+  };
+
+  const validateAssignmentForm = () => {
+    const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;
+
+    if (!username || !status || !issuanceType) {
+      setMessage("Please fill all the fields!");
+      setIsError(true);
+      return false;
+    }
+    if (specialCharacterRegex.test(username)) {
+      setMessage("Username cannot contain special characters!");
+      setIsError(true);
+      return false;
+    }
+    return true;
+  };
 
   //Assignment Functions
   const handleAssign = (book) => {
     setId(book.id);
     setTitle(book.title);
     setIsAssignModalOpen(true);
+    setMessage("");
   };
 
   const handleAssignmentSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateAssignmentForm()) {
+      return;
+    }
 
     const formattedStatus = status.toUpperCase();
     const formattedIssuanceType = issuanceType
@@ -112,104 +168,99 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
       returnDate: formattedReturnDate,
     };
 
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.post(
-        "http://localhost:8080/api/issuances/createIssuance",
-        issuanceData,
-        {
-          headers: { Authorization: token },
-        }
-      );
-
-      console.log("Issuance created:", response.data);
-      setIsAssignModalOpen(false);
-      // Reset form fields
-      setStatus("");
-      setIssuanceType("");
-      setReturnDate("");
-      setUsername("");
-      setErrorMessage("");
-    } catch (error) {
-      console.error("Error creating issuance", error);
-      setErrorMessage("Failed to create issuance. Please try again.");
-    }
+    postRequest(CREATE_ISSUANCE, issuanceData, (response) => {
+      if (response?.status === 200 || 201) {
+        setMessage("Issuance added successfully!");
+        setIsError(false);
+        setStatus("");
+        setIssuanceType("");
+        setReturnDate("");
+        setUsername("");
+        setTimeout(() => {
+          setIsAssignModalOpen(false);
+          navigate('/issuances')
+        }, 2000);
+      } else {
+        setMessage("Failed to add Issuance. Please try again");
+        setIsError(true);
+        console.error("Error creating category", response?.data);
+      }
+    });
   };
 
   //Update Functions
   const handleEdit = async (book) => {
     setSelectedBook(book);
-    setTitle(book.id);
+    setTitle(book.title);
     setAuthor(book.author);
     setAvailability(book.availability);
-    setCategoryId(book.categoryId || "");
-
-    try {
-      const token = localStorage.getItem("token");
-      const categoryResponse = await axios.get(
-        "http://localhost:8080/api/categories/allForDropDown",
-        { headers: { Authorization: token } }
-      );
-      // const response = await apiManager.getAllCategoriesDD();
-      setCategories(categoryResponse.data);
-      setIsEditModalOpen(true);
-    } catch (error) {
-      console.error("Error fetching categories", error);
-    }
+    setCategoryId(book.categories || "");
+    setIsEditModalOpen(true);
+    setMessage("");
   };
 
   const handleUpdateBook = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const updateData = {
-        title: title,
-        author: author,
-        categoryId: categoryId,
-        availability: availability,
-      };
-
-      await axios.put(
-        `http://localhost:8080/api/books/updateBook/${selectedBook.id}`,
-        updateData,
-        { headers: { Authorization: token } }
-      );
-      // await apiManager.updateBook(selectedBook.id, updateData);
-
-      setIsEditModalOpen(false);
-      setSelectedBook(null);
-      setTitle("");
-      setAuthor("");
-      setAvailability("");
-      setCategoryId("");
-      fetchData();
-    } catch (error) {
-      console.error("Error updating book", error);
+    if (!validateEditForm()) {
+      return;
     }
+
+    const updateData = {
+      title: title,
+      author: author,
+      categoryId: categoryId,
+      availability: availability,
+    };
+
+    putRequest(`${UPDATE_BOOK}${selectedBook.id}`, updateData, (response) => {
+      if (response?.status === 200 || response?.status === 201) {
+        console.log("Book updated successfully", updateData);
+        setMessage("Book updated successfully!");
+        setIsError(false);
+        setTimeout(() => {
+          setIsEditModalOpen(false);
+          setSelectedBook(null);
+          setTitle("");
+          setAuthor("");
+          setAvailability("");
+          setCategoryId("");
+        }, 2000);
+        fetchData();
+      } else if (response?.status === 409) {
+        setMessage("A book with this title already exists!");
+        setIsError(true);
+      } else {
+        setMessage("Error updating book!");
+        setIsError(true);
+        console.error("Error updating book", response?.data);
+      }
+    });
   };
 
-  //Delete Functions
+  //Delete Function
   const handleDelete = (book) => {
     setSelectedBook(book);
     setIsDeleteModalOpen(true);
+    setMessage("");
   };
 
   const handleConfirmDelete = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(
-        `http://localhost:8080/api/books/deleteBook/${selectedBook.id}`,
-        { headers: { Authorization: token } }
-      );
-      // try {
-      //   await apiManager.deleteBook(selectedBook.id);
-
-      setIsDeleteModalOpen(false);
-      setSelectedBook(null);
-      fetchData();
-    } catch (error) {
-      console.error("Error deleting book", error);
-    }
+    deleteRequest(`${DELETE_BOOK}title/${selectedBook.title}`, (response) => {
+      if (response?.status === 200) {
+        setMessage("Book deleted successfully!");
+        setIsError(false);
+        setTimeout(() => {
+          setIsDeleteModalOpen(false);
+          setSelectedBook(null);
+        }, 2000);
+        fetchData();
+      } else {
+        setMessage("Error deleting Book! Book from this category is issued");
+        setIsError(true);
+        console.error("Error deleting category", response?.data);
+      }
+    });
   };
+
   //Other Functions
   const handleHistory = (book) => {
     navigate(`/book/${book.id}/issuanceHistory?type=book`);
@@ -226,6 +277,7 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
       setCurrentPage(currentPage + 1);
     }
   };
+
   const columns = [
     { header: "S.no", accessor: "sno" },
     { header: "Title", accessor: "title" },
@@ -237,8 +289,7 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
       Cell: ({ row }) => (
         <div>
           <Button
-            className= "table-btn"
-            
+            className="table-btn"
             imageSrc={editIcon}
             active={true}
             onClick={() => handleEdit(row)}
@@ -251,8 +302,8 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
           />
           <Button
             className="table-btn"
-           imageSrc={historyIcon}
-           active={true}
+            imageSrc={historyIcon}
+            active={true}
             onClick={() => handleHistory(row)}
           />
           <Button
@@ -268,6 +319,8 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
 
   return (
     <div className="table-container">
+      {data.length > 0 ? (
+        <>
       <TableComponent columns={columns} data={data} />
       {showPagination && (
         <div className="pagination-controls">
@@ -285,15 +338,22 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
           </button>
         </div>
       )}
+       </>
+      ) : (
+        <p className="no-data-message">No data available</p>
+      )}
 
       {/* Edit Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         title="Edit Book"
-        height="500px"
-        width="450px"
       >
+        {message && (
+          <p className={isError ? "error-message" : "success-message"}>
+            {message}
+          </p>
+        )}
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -332,13 +392,12 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
           />
           <div className="modal-button-group">
             <Button name="Update" className="table-btn" />
-          <Button
-            name="Cancel"
-            className="table-btn"
-            onClick={() => setIsEditModalOpen(false)}
-          />
+            <Button
+              name="Cancel"
+              className="table-btn"
+              onClick={() => setIsEditModalOpen(false)}
+            />
           </div>
-          
         </form>
       </Modal>
 
@@ -350,6 +409,11 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
         height="250px"
         width="350px"
       >
+         {message && (
+          <p className={isError ? "error-message" : "success-message"}>
+            {message}
+          </p>
+        )}
         <p style={{ color: "black" }}>
           Are you sure you want to delete this book?
         </p>
@@ -375,65 +439,65 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
         height="580px"
         width="450px"
       >
+         {message && (
+          <p className={isError ? "error-message" : "success-message"}>
+            {message}
+          </p>
+        )}
         <form onSubmit={handleAssignmentSubmit}>
-        <label htmlFor="username">Username</label>
+          <label htmlFor="username">Title</label>
           <input
-            
             type="text"
             value={title}
             readOnly
             style={{ color: "black" }}
           />
-         
-            <label htmlFor="username">User:</label>
-            <select
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              
-            >
-              <option value="">Select User</option>
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name}
-                </option>
-              ))}
-            </select>
-        
-       
-            <label htmlFor="status">Status:</label>
-            <select value={status} onChange={(e) => setStatus(e.target.value)}>
-              <option value="">Select Status</option>
-              <option value="ISSUED">ISSUED</option>
-              <option value="RETURNED">RETURNED</option>
-            </select>
-         
-          
-            <label htmlFor="issuanceType">Issuance Type:</label>
-            <select
-              value={issuanceType}
-              onChange={(e) => setIssuanceType(e.target.value)}
-            >
-              <option value="">Select Issuance Type</option>
-              <option value="IN-HOUSE">IN-HOUSE</option>
-              <option value="TAKE AWAY">TAKE-AWAY</option>
-            </select>
-            <label htmlFor="returnDate">Returned At</label>
+
+          <label htmlFor="username">User:</label>
+          <select
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          >
+            <option value="">Select User</option>
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name}
+              </option>
+            ))}
+          </select>
+
+          <label htmlFor="status">Status</label>
           <input
-           
+            type="text"
+            value="ISSUED"
+            readOnly
+            style={{ color: "black" }}
+          />
+
+          <label htmlFor="issuanceType">Issuance Type:</label>
+          <select
+            value={issuanceType}
+            onChange={(e) => setIssuanceType(e.target.value)}
+          >
+            <option value="">Select Issuance Type</option>
+            <option value="IN-HOUSE">IN-HOUSE</option>
+            <option value="TAKE AWAY">TAKE-AWAY</option>
+          </select>
+          <label htmlFor="returnDate">Returned At</label>
+          <input
             type="date"
             value={returnDate}
             onChange={(e) => setReturnDate(e.target.value)}
           />
-          {errorMessage && <p>{errorMessage}</p>}
+          {/* {errorMessage && <p>{errorMessage}</p>} */}
           <div className="modal-button-group">
             <Button className="table-btn" type="submit" name="Assign" />
-          <Button
-            name="Cancel"
-            className="table-btn"
-            onClick={() => setIsAssignModalOpen(false)}
-          />
+            <Button
+              name="Cancel"
+              className="table-btn"
+              onClick={() => setIsAssignModalOpen(false)}
+            />
           </div>
-          
         </form>
       </Modal>
     </div>
@@ -441,3 +505,4 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
 }
 
 export default BooksTable;
+

@@ -1,34 +1,24 @@
-import axios from 'axios';
-const BASE_URL = 'http://localhost:8086'
-const axiosInstance = axios.create({
-    baseURL: BASE_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
-axiosInstance.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers['Authorization'] = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
-axiosInstance.interceptors.response.use(
-    (response) => {
-        return response;
-    },
-    (error) => {
-        if (error.response && error.response.status === 401) {
-            window.location.href = '/';
-        } else {
-            console.error('Response error:', error);
-        }
-        return Promise.reject(error);
-    }
-);
-export default axiosInstance;
+const handleDelete = (book) => {
+    setSelectedBook(book);
+    setIsDeleteModalOpen(true);
+    setMessage("");
+  };
+
+  const handleConfirmDelete = async () => {
+   
+ deleteRequest(`${DELETE_BOOK}title/${selectedBook.title}`, (response) => {
+      if (response?.status === 200) {
+        setMessage("Book deleted successfully!");
+        setIsError(false);
+        setTimeout(() => {
+          setIsDeleteModalOpen(false);
+          setSelectedBook(null);
+        }, 2000);
+        fetchData();
+      } else {
+        setMessage("Error deleting Book! Book from this category is issued");
+        setIsError(true);
+        console.error("Error deleting category", response?.data);
+      }
+    });
+  };

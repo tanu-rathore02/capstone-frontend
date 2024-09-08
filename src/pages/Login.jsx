@@ -1,181 +1,10 @@
-// import React, { useState } from "react";
-// import Button from "../components/Button";
-// import "../styles/Login.css";
-// import Toast from "../components/Toast";
-// import { useNavigate } from "react-router-dom";
-// import { useDispatch } from "react-redux";
-// import { loginUser } from "../features/auth/authSlice";
-
-// function Login() {
-//   const [email, setEmail] = useState("");
-//   const [phoneNo, setPhoneNo] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [userType, setUserType] = useState("ADMIN");
-//   const [errors, setErrors] = useState({});
-//   const [activeButton, setActiveButton] = useState("USER"); 
-//   const [toastMessage, setToastMessage] = useState("");
-//   const [showToast, setShowToast] = useState(false);
-//   const dispatch = useDispatch();
-//   const navigate = useNavigate();
-
-//   const handleButtonClick = (type) => {
-//     setUserType(type).toUpperCase();
-//     setActiveButton(type).toUpperCase();
-//   };
-
-//   const validateForm = () => {
-//     let isValid = true;
-//     const newErrors = {};
-
-//     if (userType === "ADMIN") {
-//       if (!email) {
-//         newErrors.email = "Email is required.";
-//         isValid = false;
-//       } else if (!/\S+@\S+\.\S+/.test(email)) {
-//         newErrors.email = "Invalid email format.";
-//         isValid = false;
-//       }
-//     } else {
-//       if (!phoneNo) {
-//         newErrors.phoneNo = "Phone number is required.";
-//         isValid = false;
-//       } else if (!/^\d+$/.test(phoneNo)) {
-//         newErrors.phoneNo = "Phone number must contain only digits.";
-//         isValid = false;
-//       }
-//     }
-
-//     if (!password) {
-//       newErrors.password = "Password is required.";
-//       isValid = false;
-//     } else if (password.length < 6) {
-//       newErrors.password = "Password must be at least 6 characters long.";
-//       isValid = false;
-//     }
-
-//     setErrors(newErrors);
-//     return isValid;
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     if (!validateForm()) {
-//       return;
-//     }
-
-//     const credentials =
-//       userType === "ADMIN"
-//         ? { username: email, password }
-//         : { username: phoneNo, password };
-
-//     try {
-//       const result = await dispatch(loginUser(credentials)).unwrap();
-
-//       localStorage.setItem("token", result.token);
-//       localStorage.setItem("role", userType.toUpperCase());
-//       setToastMessage("Login successful");
-//       setShowToast(true);
-
-//       setTimeout(() => {
-//         setShowToast(false);
-//         if (userType === "ADMIN") {
-//           navigate("/adminDashboard");
-//         } else {
-//           navigate("/userDashboard");
-//         }
-//       }, 3000);
-//     } catch (error) {
-//       console.error("Login failed:", error);
-//     }
-    
-//   };
-
-//   return (
-//     <div className="home-container">
-//       <div className="home-header">
-//         <h1 className="welcome-heading">Welcome Guest!</h1>
-//       </div>
-//       <div className="signin-content">
-//         <div className="signin-form">
-//           <div className="toggle-button">
-//             <Button
-//               name="Admin"
-//               onClick={() => handleButtonClick("ADMIN")}
-//               active={activeButton === "ADMIN"}
-//             />
-//             <Button
-//               name="User"
-//               onClick={() => handleButtonClick("USER")}
-//               active={activeButton === "USER"}
-//             />
-//           </div>
-//           <p>Sign-in to continue</p>
-//           <form onSubmit={handleSubmit}>
-//             <div className="signin-input-field">
-//               {userType === "ADMIN" ? (
-//                 <>
-//                   <input
-//                     type="email"
-//                     placeholder="Enter your email"
-//                     value={email}
-//                     onChange={(e) => setEmail(e.target.value)}
-//                   />
-//                   {errors.email && (
-//                     <p className="error-message">{errors.email}</p>
-//                   )}
-//                 </>
-//               ) : (
-//                 <>
-//                   <input
-//                     type="tel"
-//                     placeholder="Enter your phone number"
-//                     value={phoneNo}
-//                     onChange={(e) => setPhoneNo(e.target.value)}
-//                   />
-//                   {errors.phoneNo && (
-//                     <p className="error-message">{errors.phoneNo}</p>
-//                   )}
-//                 </>
-//               )}
-//             </div>
-//             <div className="signin-input-field">
-//               <input
-//                 type="password"
-//                 placeholder="Enter your password"
-//                 value={password}
-//                 onChange={(e) => setPassword(e.target.value)}
-//               />
-//               {errors.password && (
-//                 <p className="error-message">{errors.password}</p>
-//               )}
-//             </div>
-//             <div className="signin-button">
-//               <Button name="Sign In" className="form-btn" />
-//             </div>
-//           </form>
-//         </div>
-//         <div className="signin-image"></div>
-//       </div>
-
-//       <Toast
-//         message={toastMessage}
-//         show={showToast}
-//         onClose={() => setShowToast(false)}
-//       />
-//     </div>
-//   );
-// }
-
-// export default Login;
-
 import React, { useState } from "react";
 import Button from "../components/Button";
 import "../styles/Login.css";
 import Toast from "../components/Toast";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { loginUser } from "../features/auth/authSlice";
+import { postRequestWithoutAuth } from "../api/ApiManager";
+import { LOGIN_API } from "../api/ApiConstants";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -186,7 +15,6 @@ function Login() {
   const [activeButton, setActiveButton] = useState("USER"); 
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleButtonClick = (type) => {
@@ -203,9 +31,14 @@ function Login() {
       if (!email) {
         newErrors.email = "Email is required.";
         isValid = false;
-      } else if (!/\S+@\S+\.\S+/.test(email)) {
-        newErrors.email = "Invalid email format.";
-        isValid = false;
+      } else {
+        let atIndex = email.indexOf('@');
+        let dotIndex = email.indexOf('.');
+    
+        if (atIndex === -1 || dotIndex === -1 || email.slice(dotIndex) !== ".com" || dotIndex < atIndex) {
+          newErrors.email = "Invalid email format. Domain must end with .com.";
+          isValid = false;
+        }
       }
     } else {
       if (!phoneNo) {
@@ -214,6 +47,8 @@ function Login() {
       } else if (!/^\d+$/.test(phoneNo)) {
         newErrors.phoneNo = "Phone number must contain only digits.";
         isValid = false;
+      }else if (phoneNo.length <10){
+        newErrors.phoneNo = "Phone number must be 10 digits long";
       }
     }
 
@@ -229,40 +64,71 @@ function Login() {
     return isValid;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-  
-    if (!validateForm()) {
-      return;
-    }
-  
+
+    if (!validateForm()) return;
+
     const credentials =
       userType === "ADMIN"
-        ? { username: email, password }  
-        : { username: phoneNo, password };  
-  
-    try {
-      const result = await dispatch(loginUser(credentials)).unwrap();
-      
-      if (result) {
-        localStorage.setItem("token", result.token);
-        localStorage.setItem("role", userType); 
+        ? { username: email, password }
+        : { username: phoneNo, password };
+
+    postRequestWithoutAuth(LOGIN_API, credentials, (response) => {
+      if (response?.status === 200 || response?.status === 201) {
+        const { token } = response.data;
+        const { id } = response.data;
+        const { name } = response.data;
+
+     
+        localStorage.setItem("token", token);
+        localStorage.setItem("role", userType);
+        localStorage.setItem("userId", id);
+        localStorage.setItem("name", name);
+
         setToastMessage("Login successful");
         setShowToast(true);
-  
+
         setTimeout(() => {
           setShowToast(false);
           navigate(userType === "ADMIN" ? "/adminDashboard" : "/userDashboard");
         }, 2000);
+      } else if (response?.status === 401 || response?.status === 403) {
+        
+        setErrors({ general: "Incorrect username or password. Please try again." });
+      } else {
+        setErrors({ general: "Login failed. Please try again." });
       }
-    } catch (error) {
-      if (error.errorCode === 'INTERNAL_SERVER_ERROR'){
-        setErrors("Username and Password doesn't match");
-      }
-      console.error("Login failed:", error);
+    });
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+    if (errors.email) {
+      setErrors((prevErrors) => ({ ...prevErrors, email: "" }));
+    }
+
+    
+  };
+
+  const handlePhoneNoChange = (e) => {
+    setPhoneNo(e.target.value);
+    if (errors.phoneNo) {
+      setErrors((prevErrors) => ({ ...prevErrors, phoneNo: "" }));
     }
   };
-  
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    if (errors.password || errors.general) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        password: "",
+        general: "",
+      }));
+    }
+  };
+
   return (
     <div className="home-container">
       <div className="home-header">
@@ -291,7 +157,7 @@ function Login() {
                     type="email"
                     placeholder="Enter your email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleEmailChange}
                   />
                   {errors.email && (
                     <p className="error-message">{errors.email}</p>
@@ -303,7 +169,7 @@ function Login() {
                     type="tel"
                     placeholder="Enter your phone number"
                     value={phoneNo}
-                    onChange={(e) => setPhoneNo(e.target.value)}
+                    onChange={handlePhoneNoChange}
                   />
                   {errors.phoneNo && (
                     <p className="error-message">{errors.phoneNo}</p>
@@ -316,10 +182,13 @@ function Login() {
                 type="password"
                 placeholder="Enter your password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange}
               />
               {errors.password && (
                 <p className="error-message">{errors.password}</p>
+              )}
+              {errors.general && (
+                <p className="error-message">{errors.general}</p>
               )}
             </div>
             <div className="signin-button">

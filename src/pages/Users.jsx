@@ -7,8 +7,10 @@ import Button from '../components/Button';
 import Searchbar from '../components/Searchbar';
 import UsersTable from '../components/UsersTable';
 import '../styles/Pages.css';
-import axios from 'axios';
+
 import Modal from '../components/Modal';
+import { postRequest } from '../api/ApiManager';
+import { CREATE_USER } from '../api/ApiConstants';
 
 function Users() {
  
@@ -17,7 +19,9 @@ function Users() {
   const [email, setEmail] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
+  const [errors, setErrors] = useState("");
   const [refresh, setRefresh] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); 
 
@@ -32,47 +36,91 @@ function Users() {
     setEmail('');
     setMobileNumber('');
     setPassword('');
-    setErrorMessage('');
+    setMessage('');
+    setErrors({
+      name: "",
+      mobileNumber: "",
+      email: "",
+      
+    });
+  };
+
+  
+  const validateForm = () => {
+    const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;
+
+    if (!name || !mobileNumber || !email) {
+      setMessage("Please fill all the fields!");
+      setIsError(true);
+      return false;
+    }
+    if (specialCharacterRegex.test(name) || specialCharacterRegex.test(mobileNumber)) {
+      setMessage("Username cannot contain special characters!");
+      setIsError(true);
+      return false;
+    }
+   
+    if (!email) {
+      setMessage("Email is required.");
+      setIsError(true);
+      return false;
+    } else {
+      let atIndex = email.indexOf('@');
+      let dotIndex = email.indexOf('.');
+  
+      if (atIndex === -1 || dotIndex === -1 || email.slice(dotIndex) !== ".com" || dotIndex < atIndex) {
+        setMessage("Invalid email format. Domain must end with .com");
+        setIsError(true);
+        return false;
+      }
+    }
+
+    if (!/^\d+$/.test(mobileNumber)) {
+      setMessage("Phone number must contain only digits.");
+      return false;
+    }else if (mobileNumber.length <10){
+      setMessage("Phone number must be 10 digits long");
+      return false;
+    }
+    return true;
   };
 
  
   const handleUserSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const token = localStorage.getItem("token");
-      
-      
-      const userData = {
-        name: name,
-        mobileNumber: mobileNumber,
-        email: email,
-        password: password,
-        role: "ROLE_USER", 
-      };
 
-      
-      const response = await axios.post(
-        "http://localhost:8080/api/register",
-        userData,
-        {
-          headers: {
-            Authorization: token,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      
-      console.log("User Registered:", response.data);
-      
-      
-      handleCloseModal();
-
-      
-      setRefresh((prev) => !prev);
-    } catch (error) {
-      console.error("Error registering user", error);
-      setErrorMessage("Failed to register user. Please try again.");
+    
+    if (!validateForm()) {
+      return;
     }
+
+    const userData = {
+      name: name,
+      mobileNumber: mobileNumber,
+      email: email,
+      password: password,
+      role: "ROLE_USER", 
+    };
+
+    postRequest(CREATE_USER, userData, (response) => {
+        if (response?.status === 200 || 201){
+          setMessage("User Added Successfully!");
+          setIsError(false);
+          console.log("Book created:", response.data);
+        setTimeout(() => {
+          handleCloseModal();
+        }, 2000);
+
+        setRefresh((prev) => !prev);
+        }else if (response?.status === 409) {
+          setMessage("User with this credentials already exists!");
+          setIsError(true);
+        } else {
+          console.error("Error creating user", response?.data);
+          setMessage("Failed to add user. Please try again");
+          setIsError(true);
+        }
+    });
   };
 
   
@@ -94,9 +142,12 @@ function Users() {
         title="Add User"
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        height="500px"
-        width="400px"
       >
+        {message && (
+          <p className={isError ? "error-message" : "success-message"}>
+            {message}
+          </p>
+        )}
         <form onSubmit={handleUserSubmit} className="user-form">
         <label htmlFor="Nname">Username</label>
           <input
@@ -104,7 +155,7 @@ function Users() {
             
             value={name}
             onChange={(e) => setName(e.target.value)}
-            required
+           
           />
            <label htmlFor="email">Email</label>
           <input
@@ -112,7 +163,7 @@ function Users() {
            
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
+      
           />
            <label htmlFor="mobileNumber">Mobile Number</label>
           <input
@@ -120,19 +171,8 @@ function Users() {
           
             value={mobileNumber}
             onChange={(e) => setMobileNumber(e.target.value)}
-            required
+     
           />
-           <label htmlFor="password">Password</label>
-          <input
-            type="password" 
-           
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          
-          {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-          
           <div className='modal-button-group'>
             <Button type="submit" name="Add" className="table-btn" />
           <Button type="submit" name="Cancel" className="table-btn"  onClick={handleCloseModal}/>

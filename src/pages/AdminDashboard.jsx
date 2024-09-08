@@ -10,8 +10,9 @@ import totalBooks from "../assets/totalBooks.png";
 import inHouseReaders from "../assets/inHouseReaders.png";
 import issuedBooks from "../assets/issuedBooks.png";
 import { Link } from "react-router-dom";
-import axios from "axios";
 
+import { getRequest } from "../api/ApiManager";
+import { GET_BOOK_COUNT, GET_USER_COUNT, GET_CATEGORY_COUNT, GET_INHOUSE_READER_COUNT,GET_USER } from "../api/ApiConstants"; 
 
 function AdminDashboard({showPagination = false}) {
 
@@ -21,105 +22,64 @@ function AdminDashboard({showPagination = false}) {
   const [reader, setReader] = useState(0);
   const [data, setData] = useState([]);
 
+ 
+  const fetchUsers = () => {
+    getRequest( GET_USER_COUNT, (response) => {
+      if (response && response.data) {
+        setUserCount(response.data);
+      }
+    });
+  };
 
-  const fetchUsers = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:8080/api/user-count", {
-        headers: {
-          Authorization: token,
-        },
-      });
-      setUserCount(response.data);
-    } catch (error) {
-      console.error("Error fetching users count", error);
-    }
-  }
+  const fetchInHouseReaders = () => {
+    getRequest(GET_INHOUSE_READER_COUNT, (response) => {
+      if (response && response.data) {
+        setReader(response.data);
+      }
+    });
+  };
 
-  const fetchInHouseReaders = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:8080/api/issuances/type/count", {
-        headers: {
-          Authorization: token,
-        },
-      });
-      setReader(response.data);
-    } catch (error) {
-      console.error("Error fetching users count", error);
-    }
-  }
 
-  const fetchCategories = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:8080/api/categories/categoryCount", {
-        headers: {
-          Authorization: token,
-        },
-      });
-      setCategoryCount(response.data);
-    } catch (error) {
-      console.error("Error fetching categories count", error);
-    }
-  }
+  const fetchCategories = () => {
+    getRequest(GET_CATEGORY_COUNT, (response) => {
+      if (response && response.data) {
+        setCategoryCount(response.data);
+      }
+    });
+  };
 
-const fetchBooks = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:8080/api/books/title-count", {
-        headers: {
-          Authorization: token,
-        },
-      });
-      setBookCount(response.data);
-    } catch (error) {
-      console.error("Error fetching books count", error);
-    }
-  }
-  useEffect( () => {
+  const fetchBooks = () => {
+    getRequest(GET_BOOK_COUNT, (response) => {
+      if (response && response.data) {
+        setBookCount(response.data);
+      }
+    });
+  };
+
+
+  const fetchData = () => {
+    getRequest(`${GET_USER}?page=0&size=4&sortBy=id&sortDir=asc&search=`, (response) => {
+      if (response && response.data) {
+        setData(
+          response.data.content.map((user, index) => ({
+            sno: index + 1,
+            id: user.id,
+            name: user.name,
+            mobileNumber: user.mobileNumber,
+            email: user.email,
+            role: user.role,
+            password: user.password,
+          }))
+        );
+      }
+    });
+  };
+
+  useEffect(() => {
     fetchBooks();
     fetchUsers();
     fetchCategories();
     fetchInHouseReaders();
-    
-  }, [])
-
-  const fetchData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:8080/api/users`, {
-        headers: {
-          Authorization: token,
-        },
-        params: {
-          page: 0,
-          size: 4,
-          sortBy: "id",
-          sortDir: "asc",
-          search:  "",
-        },
-      });
-
-      setData(
-        response.data.content.map((user, index) => ({
-          sno: index + 1,
-          id: user.id,
-          name: user.name,
-          mobileNumber: user.mobileNumber,
-          email: user.email,
-          role: user.role,
-          password: user.password,
-        }))
-      );
-      console.log("data:", data);
-      
-    } catch (error) {
-      console.error("Error fetching users", error);
-    }
-  };
-
-  useEffect(() => {
     fetchData();
   }, []);
 
@@ -139,9 +99,8 @@ const fetchBooks = async () => {
         <Card name="Total Books" value={bookCount} image={issuedBooks} />
       </div>
       <h2 className="heading">Registered Users</h2>
-      {/* <CategoryTable showPagination={false} /> */}
       <TableComponent columns={columns} data={data}/>
-      <Link  to='/users'>Browse all users</Link>
+      <Link to='/users'>Browse all users</Link>
     </div>
   );
 }

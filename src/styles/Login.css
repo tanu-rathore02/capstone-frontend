@@ -113,3 +113,10 @@ input::placeholder {
     background-size: cover;
     background-position: center;
 }
+
+.input-error {
+    color: red;
+    font-size: 12px;
+    margin-top: 4px;
+    margin-bottom: 0;
+  }

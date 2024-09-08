@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Button from "./Button";
 import Modal from "./Modal";
 import TableComponent from "./TableComponent";
 import "../styles/Modal.css";
+import { getRequest, deleteRequest, putRequest } from "../api/ApiManager";
+import { GET_ISSUANCE,  DELETE_ISSUANCE, UPDATE_ISSUANCE } from "../api/ApiConstants";
 
 function IssuancesTable({ showPagination = true, refresh, searchTerm }) {
   const [data, setData] = useState([]);
@@ -19,72 +20,84 @@ function IssuancesTable({ showPagination = true, refresh, searchTerm }) {
   const [bookId, setBookId] = useState("");
   
 
-  // Get data
-  const fetchData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `http://localhost:8080/api/issuances/allIssuances`,
-        {
-          headers: { Authorization: token },
-          params: {
-            page: currentPage,
-            size: 8,
-            sortBy: "id",
-            sortDir: "asc",
-            search: searchTerm || "",
-          },
-        }
-      );
 
-    response.data.content.forEach((issuance) => {
-      console.log("Issuance Data:", issuance); 
-    });
-
-      setData(
-        response.data.content.map((issuance, index) => ({
-          id: issuance.id,
-          sno: index + 1 + currentPage * 8,
-          users: issuance.users?.name || {}, 
-          books: issuance.books?.title || {}, 
-          issueDate: issuance.issueDate,
-          returnDate: issuance.returnDate,
-          status: issuance.status,
-          issuanceType: issuance.issuanceType,
-        }))
-      );
-      setTotalPages(response.data.totalPages);
-    } catch (error) {
-      console.error("Error fetching issuances", error);
-    }
+  
+const fetchData = () => {
+  const params = {
+    page: currentPage,
+    size: 8,
+    sortBy: "id",
+    sortDir: "asc",
+    search: searchTerm || "",
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [currentPage, refresh, searchTerm]);
+  getRequest(
+    `${GET_ISSUANCE}?page=${currentPage}&size=6&sortBy=id&sortDir=desc&search=${searchTerm || ""}`, 
+    (response) => {
+      if (response?.status === 200) {
+        const issuances = response.data.content;
+        issuances.forEach((issuance) => {
+          console.log("Issuance Data:", issuance);
+        });
 
-  // Handle edit
+        setData(
+          issuances.map((issuance, index) => ({
+            id: issuance.id,
+            sno: index + 1 + currentPage * 8,
+            users: issuance.users?.name || {}, 
+            books: issuance.books?.title || {}, 
+            issueDate: issuance.issueDate,
+            returnDate: issuance.returnDate,
+            status: issuance.status,
+            issuanceType: issuance.issuanceType,
+          }))
+        );
+        setTotalPages(response.data.totalPages);
+      } else {
+        console.error("Error fetching issuances", response?.data);
+      }
+    },
+    {
+      params, 
+    }
+  );
+};
+
+useEffect(() => {
+  fetchData();
+}, [currentPage, refresh, searchTerm]);
+
+
+
   const handleEdit = (issuance) => {
+  
     const formatDateTime = (dateString, time = "15:30:00") => {
-      return dateString + "T" + time;
+      return dateString ? `${dateString}T${time}` : "";
     };
-    const formattedReturnDate = formatDateTime(issuance.returnDate || ""); 
+  
 
-    setSelectedIssuance(issuance);
+    const formattedReturnDate = formatDateTime(issuance.returnDate || "");
+
+    setSelectedIssuance(issuance); 
     setUserId(issuance.users?.id || ""); 
     setBookId(issuance.books?.id || ""); 
-    setReturnDate(formattedReturnDate);
-    setStatus(issuance.status || "");
-    setIssuanceType(issuance.issuanceType || "");
+    setReturnDate(formattedReturnDate); 
+    setStatus(issuance.status || ""); 
+    setIssuanceType(issuance.issuanceType || ""); 
+    
+    
     setIsEditModalOpen(true);
   };
-
-  const handleConfirmEdit = async (e) => {
+  
+  const handleConfirmEdit = (e) => {
     e.preventDefault();
-    try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:8080/api/issuances/updateIssuance/${selectedIssuance.id}`,
+
+    console.log("User ID:", userId);
+    console.log("Book ID:", bookId);
+  
+    if (selectedIssuance && userId && bookId) {
+      putRequest(
+        `${UPDATE_ISSUANCE}${selectedIssuance.id}`, 
         {
           userId, 
           bookId, 
@@ -92,41 +105,46 @@ function IssuancesTable({ showPagination = true, refresh, searchTerm }) {
           status,
           issuanceType,
         },
-        {
-          headers: { Authorization: token },
+        (response) => {
+          if (response?.status === 200 || response?.status === 201) {
+            console.log("Issuance updated:", response.data);
+            setIsEditModalOpen(false);
+            fetchData(); 
+          } else {
+            console.error("Error updating issuance", response?.data);
+          }
         }
       );
-
-      setIsEditModalOpen(false);
-      fetchData();
-    } catch (error) {
-      console.error("Error updating issuance", error);
+    } else {
+      console.error("User ID or Book ID is missing");
     }
   };
+  
 
-  // Handle delete
+  
   const handleDelete = (issuance) => {
     setSelectedIssuance(issuance);
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(
-        `http://localhost:8080/api/issuances/deleteIssuance/${selectedIssuance.id}`,
-        {
-          headers: { Authorization: token },
+ 
+const handleConfirmDelete = () => {
+  if (selectedIssuance?.id) {
+    deleteRequest(
+      `${DELETE_ISSUANCE}${selectedIssuance.id}`, 
+      (response) => {
+        if (response?.status === 200 || response?.status === 201) {
+          console.log("Issuance deleted:", response.data);
+          setIsDeleteModalOpen(false);
+          setSelectedIssuance(null);
+          fetchData(); 
+        } else {
+          console.error("Error deleting issuance", response?.data);
         }
-      );
-
-      setIsDeleteModalOpen(false);
-      setSelectedIssuance(null);
-      fetchData();
-    } catch (error) {
-      console.error("Error deleting issuance", error);
-    }
-  };
+      }
+    );
+  }
+};
 
   const handlePreviousPage = () => {
     if (currentPage > 0) {
@@ -187,58 +205,51 @@ function IssuancesTable({ showPagination = true, refresh, searchTerm }) {
         </div>
       )}
       <Modal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        title="Edit Issuance"
-        height="450px"
-        width="450px"
-      >
-        <label htmlFor="name">Username</label>
-        <input type="text" value={selectedIssuance?.users?.name || ""} readOnly />
+  isOpen={isEditModalOpen}
+  onClose={() => setIsEditModalOpen(false)}
+  title="Edit Issuance"
+  height="450px"
+  width="450px"
+>
+  <label htmlFor="name">Username</label>
+  <input type="text" value={selectedIssuance?.users?.name || ""} readOnly />
 
-        <label htmlFor="title">Book</label>
-        <input type="text" value={selectedIssuance?.books?.title || ""} readOnly />
+  <label htmlFor="title">Book</label>
+  <input type="text" value={selectedIssuance?.books?.title || ""} readOnly />
 
-        <label htmlFor="name">Issuance Type</label>
-        <input type="text" value={issuanceType} readOnly />
+  <label htmlFor="name">Issuance Type</label>
+  <input type="text" value={issuanceType} readOnly />
 
-        <label htmlFor="returnDate">Return Date</label>
-        <input
-          type="datetime-local"
-          value={returnDate}
-          onChange={(e) => setReturnDate(e.target.value)}
-        />
+  <label htmlFor="returnDate">Return Date</label>
+  <input
+    type="datetime-local"
+    value={returnDate}
+    onChange={(e) => setReturnDate(e.target.value)}
+  />
 
-        <div>
-          <label>Status:</label>
-          <input
-            type="radio"
-            value="ISSUED"
-            checked={status === "ISSUED"}
-            onChange={(e) => setStatus(e.target.value)}
-          />
-          <label>ISSUED</label>
-          <input
-            type="radio"
-            value="RETURNED"
-            checked={status === "RETURNED"}
-            onChange={(e) => setStatus(e.target.value)}
-          />
-          <label>RETURNED</label>
-        </div>
-        <div className="modal-button-group">
-          <Button
-            name="Update"
-            className="table-btn"
-            onClick={handleConfirmEdit}
-          />
-          <Button
-            name="Cancel"
-            className="table-btn"
-            onClick={() => setIsEditModalOpen(false)}
-          />
-        </div>
-      </Modal>
+  <div>
+    <label>Status:</label>
+    <input
+      type="radio"
+      value="ISSUED"
+      checked={status === "ISSUED"}
+      onChange={(e) => setStatus(e.target.value)}
+    />
+    <label>ISSUED</label>
+    <input
+      type="radio"
+      value="RETURNED"
+      checked={status === "RETURNED"}
+      onChange={(e) => setStatus(e.target.value)}
+    />
+    <label>RETURNED</label>
+  </div>
+  <div className="modal-button-group">
+    <Button name="Update" className="table-btn" onClick={handleConfirmEdit} />
+    <Button name="Cancel" className="table-btn" onClick={() => setIsEditModalOpen(false)} />
+  </div>
+</Modal>
+
       <Modal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
