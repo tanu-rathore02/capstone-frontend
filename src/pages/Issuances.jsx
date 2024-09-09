@@ -4,7 +4,6 @@ import IssuancesTable from "../components/IssuancesTable";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 import HocWrapper from "../components/HocWrapper";
-import Searchbar from "../components/Searchbar";
 import Button from "../components/Button";
 import axios from "axios";
 import Modal from "../components/Modal";
@@ -15,8 +14,8 @@ function Issuances() {
   const [returnDate, setReturnDate] = useState('');
   const [status, setStatus] = useState('');
   const [issuanceType, setIssuanceType] = useState('');
-  const [users, setUsers] = useState([]); // State to hold users in dropdown
-  const [books, setBooks] = useState([]); // State to hold books in dropdown
+  const [users, setUsers] = useState([]); 
+  const [books, setBooks] = useState([]);
   const [username, setUsername] = useState( );
   const [bookname, setBookname] = useState( );
   const [errorMessage, setErrorMessage] = useState('');
@@ -32,7 +31,7 @@ function Issuances() {
             Authorization: token,
           },
         });
-        setUsers(response.data); // Set users in state
+        setUsers(response.data); 
       } catch (error) {
         console.error("Error fetching users", error);
       }
@@ -134,8 +133,7 @@ function Issuances() {
         title="Add Issuance"
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        height="500px"
-        width="450px"
+       
       >
         <form onSubmit={handleIssuanceSubmit}>
         <label htmlFor="name">Username</label>

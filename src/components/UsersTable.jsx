@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+
 import TableComponent from "./TableComponent";
 import Modal from "./Modal";
+import editIcon from "../assets/editIcon.svg";
+import deleteIcon from "../assets/deleteIcon.svg";
+import assignIcon from "../assets/assignIcon.svg";
+import historyIcon from "../assets/historyIcon.svg";
 import Button from "./Button";
 import {
   getRequest,
@@ -127,7 +131,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
 
 
   const validateAssignmentForm = () => {
-    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split("T")[0]; 
 
     if (!returnDate || !status || !issuanceType) {
       setMessage("Please fill all the fields!");
@@ -267,7 +271,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
         setIsDeleteModalOpen(false);
         setSelectedUser(null);
         fetchData();
-      } else {
+      } else{
         setMessage("Error deleting Book! Book from this category is issued");
         setIsError(true);
         console.error("Error deleting category", response?.data);
@@ -303,22 +307,22 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
         <div>
           <Button
             className="table-btn"
-            name="Edit"
+            imageSrc={editIcon}
             onClick={() => handleEdit(row)}
           />
           <Button
             className="table-btn"
-            name="Delete"
+            imageSrc={deleteIcon}
             onClick={() => handleDelete(row)}
           />
           <Button
             className="table-btn"
-            name="History"
+            imageSrc={historyIcon}
             onClick={() => handleHistory(row)}
           />
           <Button
             className="table-btn"
-            name="Assign"
+            imageSrc={assignIcon}
             onClick={() => handleAssign(row)}
           />
         </div>
@@ -357,8 +361,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
         title="Edit User"
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        height="500px"
-        width="450px"
+       
       >
         {message && (
           <p className={isError ? "error-message" : "success-message"}>
@@ -391,10 +394,10 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
             onChange={(e) => setPassword(e.target.value)}
           />
           <div className="modal-button-group">
-            <Button className="table-btn" type="submit" name="Save" />
+            <Button className="modal-btn" type="submit" name="Save" />
             <Button
               name="Cancel"
-              className="table-btn"
+              className="modal-btn"
               onClick={() => setIsEditModalOpen(false)}
             />
           </div>
@@ -406,8 +409,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
         title="Delete User"
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        height="250px"
-        width="300px"
+       
       >
         {message && (
           <p className={isError ? "error-message" : "success-message"}>
@@ -417,12 +419,12 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
         <p>Are you sure you want to delete this user?</p>
         <div className="modal-button-group">
           <Button
-            className="table-btn"
+            className="modal-btn"
             name="Delete"
             onClick={handleConfirmDelete}
           />
           <Button
-            className="table-btn"
+            className="modal-btn"
             name="Cancel"
             onClick={() => setIsDeleteModalOpen(false)}
           />
@@ -434,8 +436,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
         title="Assign Book"
         isOpen={isAssignModalOpen}
         onClose={() => setIsAssignModalOpen(false)}
-        height="580px"
-        width="500px"
+       
       >
         {message && (
           <p className={isError ? "error-message" : "success-message"}>
@@ -484,10 +485,10 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
           />
           {errorMessage && <p>{errorMessage}</p>}
           <div className="modal-button-group">
-            <Button className="table-btn" type="submit" name="Assign" />
+            <Button className="modal-btn" type="submit" name="Assign" />
             <Button
               name="Cancel"
-              className="table-btn"
+              className="modal-btn"
               onClick={() => setIsAssignModalOpen(false)}
             />
           </div>

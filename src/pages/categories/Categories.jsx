@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import Navbar from "../components/Navbar";
-import Header from "../components/Header";
-import HocWrapper from "../components/HocWrapper";
-import Button from "../components/Button";
-import Searchbar from "../components/Searchbar";
-import CategoryTable from "../components/CategoryTable";
-import Modal from "../components/Modal";
-import { postRequest } from "../api/ApiManager";
-import { CREATE_CATEGORY } from "../api/ApiConstants";
-import "../styles/Pages.css";
+import Navbar from "../../components/Navbar";
+import Header from "../../components/Header";
+import HocWrapper from "../../components/HocWrapper";
+import Button from "../../components/Button";
+import Searchbar from "../../components/Searchbar";
+import CategoryTable from "./CategoryTable"
+import Modal from "../../components/Modal"
+import { postRequest } from "../../api/ApiManager";
+import { CREATE_CATEGORY } from "../../api/ApiConstants";
+import "../../styles/Pages.css";
 
 function Categories() {
   const [isModalOpen, setIsModalOpen] = useState(false);

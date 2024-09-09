@@ -391,10 +391,10 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
             onChange={(e) => setAvailability(e.target.value)}
           />
           <div className="modal-button-group">
-            <Button name="Update" className="table-btn" />
+            <Button name="Update" className="modal-btn" />
             <Button
               name="Cancel"
-              className="table-btn"
+              className="modal-btn"
               onClick={() => setIsEditModalOpen(false)}
             />
           </div>
@@ -406,8 +406,6 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         title="Delete Book"
-        height="250px"
-        width="350px"
       >
          {message && (
           <p className={isError ? "error-message" : "success-message"}>
@@ -420,12 +418,12 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
         <div className="modal-button-group">
           <Button
             name="Delete"
-            className="table-btn"
+            className="modal-btn"
             onClick={handleConfirmDelete}
           />
           <Button
             name="Cancel"
-            className="table-btn"
+            className="modal-btn"
             onClick={() => setIsDeleteModalOpen(false)}
           />
         </div>
@@ -436,8 +434,7 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
         title="Assign Book"
         isOpen={isAssignModalOpen}
         onClose={() => setIsAssignModalOpen(false)}
-        height="580px"
-        width="450px"
+
       >
          {message && (
           <p className={isError ? "error-message" : "success-message"}>
@@ -491,10 +488,10 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
           />
           {/* {errorMessage && <p>{errorMessage}</p>} */}
           <div className="modal-button-group">
-            <Button className="table-btn" type="submit" name="Assign" />
+            <Button className="modal-btn" type="submit" name="Assign" />
             <Button
               name="Cancel"
-              className="table-btn"
+              className="modal-btn"
               onClick={() => setIsAssignModalOpen(false)}
             />
           </div>

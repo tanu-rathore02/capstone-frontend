@@ -25,6 +25,7 @@ export const UPDATE_ISSUANCE = "issuances/updateIssuance/";
 export const DELETE_ISSUANCE = "issuances/deleteIssuance/";
 export const GET_ISSUANCE_BY_BOOK = "issuances/book/"
 export const GET_ISSUANCE_BY_USER = "issuances/user/"
+export const GET_ISSUANCE_BY_ID = "issuances/issuance/"
 
 export const GET_USER_COUNT = "user-count";
 export const GET_BOOK_COUNT = "books/title-count";

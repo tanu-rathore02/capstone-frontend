@@ -134,7 +134,7 @@ function Books() {
       />
 
       <Modal title="Add Book" isOpen={isModalOpen} onClose={handleCloseModal}
-      width="400px">
+      >
         {message && (
           <p className={isError ? "error-message" : "success-message"}>
             {message}

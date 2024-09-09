@@ -2,15 +2,19 @@ import React, { useState } from 'react';
 import Button from './Button';
 import Modal from './Modal'; 
 import '../styles/Header.css';
-import { useNavigate } from 'react-router-dom';
+
+
 
 function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false); 
-  const navigate = useNavigate();
+   const user = localStorage.getItem('name');
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    navigate('/');
+    localStorage.removeItem('role');
+    localStorage.removeItem('id');
+    localStorage.removeItem('name');
+    window.location.href = '/';
   };
 
   const openModal = () => {
@@ -28,7 +32,7 @@ function Header() {
 
   return (
     <div className="header">
-      <h1>Welcome</h1>
+      <h1>Welcome {user}</h1>
       <div className="header-btn">
         <Button name="Sign-out" className="form-btn" onClick={openModal} />
       </div>
@@ -43,8 +47,8 @@ function Header() {
       >
         <p>Are you sure you want to log out?</p>
         <div className="modal-button-group">
-          <Button name="Yes, Log Out" className="table-btn" onClick={confirmLogout} />
-          <Button name="Cancel" className="table-btn" onClick={closeModal} />
+          <Button name="Yes, Log Out" className="modal-btn" onClick={confirmLogout} />
+          <Button name="Cancel" className="modal-btn" onClick={closeModal} />
         </div>
       </Modal>
     </div>

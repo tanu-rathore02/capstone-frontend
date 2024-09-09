@@ -1,8 +1,10 @@
 .logo-container {
-    display: flex;
-    align-items: center;
-    padding-top: 20px;
+   
+    align-items: left;
+    padding-top: 10px;
     margin-top: 10px;
+    left: 10%;
+    margin-left: 2%;
 }
 
   

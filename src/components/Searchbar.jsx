@@ -11,7 +11,6 @@ function Searchbar({ onSearch }) {
     setSearchInput(value);
 
     if (value.length === 0) {
-      // If input is cleared, display original data
       setErrorMessage('');
       if (onSearch) {
         onSearch('');

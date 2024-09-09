@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import Login from "./pages/Login";import AdminDashboard from "./pages/AdminDashboard";
-import Categories from "./pages/Categories";
+import Categories from "./pages/categories/Categories";
 import Issuances from "./pages/Issuances";
 import UserDashboard from "./pages/UserDashboard";
 import Books from "./pages/Books";
@@ -22,7 +22,7 @@ function App() {
           
           <Route 
             path="/" 
-            element={<Login />} 
+            element={isLoggedIn ? <Navigate to={role === "ADMIN" ? "/adminDashboard" : "/userDashboard"} /> : <Login />} 
           />
           <Route element={<ProtectedRoutes allowedRoles={['ADMIN']} />}>
             <Route path="/adminDashboard" element={<AdminDashboard />} />

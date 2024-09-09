@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import Header from '../components/Header';
 import TableComponent from '../components/TableComponent';
 import axios from 'axios';
+import '../styles/UserDashboard.css'
 
 
 const UserDashboard = () => {

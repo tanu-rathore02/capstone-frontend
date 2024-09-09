@@ -3,8 +3,10 @@ import Button from "./Button";
 import Modal from "./Modal";
 import TableComponent from "./TableComponent";
 import "../styles/Modal.css";
+import editIcon from "../assets/editIcon.svg";
+import deleteIcon from "../assets/deleteIcon.svg";
 import { getRequest, deleteRequest, putRequest } from "../api/ApiManager";
-import { GET_ISSUANCE,  DELETE_ISSUANCE, UPDATE_ISSUANCE } from "../api/ApiConstants";
+import { GET_ISSUANCE,  DELETE_ISSUANCE, UPDATE_ISSUANCE, GET_ISSUANCE_BY_ID } from "../api/ApiConstants";
 
 function IssuancesTable({ showPagination = true, refresh, searchTerm }) {
   const [data, setData] = useState([]);
@@ -25,7 +27,7 @@ function IssuancesTable({ showPagination = true, refresh, searchTerm }) {
 const fetchData = () => {
   const params = {
     page: currentPage,
-    size: 8,
+    size: 5,
     sortBy: "id",
     sortDir: "asc",
     search: searchTerm || "",
@@ -43,9 +45,9 @@ const fetchData = () => {
         setData(
           issuances.map((issuance, index) => ({
             id: issuance.id,
-            sno: index + 1 + currentPage * 8,
-            users: issuance.users?.name || {}, 
-            books: issuance.books?.title || {}, 
+            sno: index + 1 + currentPage * 5,
+            users: issuance.users || {}, 
+            books: issuance.books || {}, 
             issueDate: issuance.issueDate,
             returnDate: issuance.returnDate,
             status: issuance.status,
@@ -69,24 +71,35 @@ useEffect(() => {
 
 
 
-  const handleEdit = (issuance) => {
+  const handleEdit = async(issuance) => {
+    let newIssuance = {};
+
+   
+     await getRequest( `${GET_ISSUANCE_BY_ID}${issuance.id}` , (response) => {
+     
+        newIssuance = response.data;
+        setSelectedIssuance(response.data);
+        console.log(response.data);
+      
+    });
   
     const formatDateTime = (dateString, time = "15:30:00") => {
       return dateString ? `${dateString}T${time}` : "";
     };
   
 
-    const formattedReturnDate = formatDateTime(issuance.returnDate || "");
+    const formattedReturnDate = formatDateTime(newIssuance.returnDate || "");
 
-    setSelectedIssuance(issuance); 
-    setUserId(issuance.users?.id || ""); 
-    setBookId(issuance.books?.id || ""); 
+    
+    setUserId(newIssuance.users?.id || ""); 
+    setBookId(newIssuance.books?.id || ""); 
     setReturnDate(formattedReturnDate); 
-    setStatus(issuance.status || ""); 
-    setIssuanceType(issuance.issuanceType || ""); 
+    setStatus(newIssuance.status || ""); 
+    setIssuanceType(newIssuance.issuanceType || ""); 
     
     
     setIsEditModalOpen(true);
+    
   };
   
   const handleConfirmEdit = (e) => {
@@ -95,7 +108,7 @@ useEffect(() => {
     console.log("User ID:", userId);
     console.log("Book ID:", bookId);
   
-    if (selectedIssuance && userId && bookId) {
+    if (selectedIssuance) {
       putRequest(
         `${UPDATE_ISSUANCE}${selectedIssuance.id}`, 
         {
@@ -120,6 +133,12 @@ useEffect(() => {
     }
   };
   
+  const dataWithSerialNumbers = data?.map((issuance, index) => ({
+    ...issuance,
+    sno: currentPage * 5 + index + 1,
+    users: issuance.users.name,
+    books: issuance.books.title,
+}));
 
   
   const handleDelete = (issuance) => {
@@ -172,12 +191,14 @@ const handleConfirmDelete = () => {
         <div>
           <Button
             className="table-btn"
-            name="Edit"
-            onClick={() => handleEdit(row)}
+            imageSrc={editIcon}
+            onClick={() => { alert(JSON.stringify(row))
+               handleEdit(row)}}
+            
           />
           <Button
             className="table-btn"
-            name="Delete"
+            imageSrc={deleteIcon}
             onClick={() => handleDelete(row)}
           />
         </div>
@@ -187,7 +208,7 @@ const handleConfirmDelete = () => {
 
   return (
     <div className="table-container">
-      <TableComponent columns={columns} data={data} />
+      <TableComponent columns={columns} data={dataWithSerialNumbers} />
       {showPagination && (
         <div className="pagination-controls">
           <button onClick={handlePreviousPage} disabled={currentPage === 0}>
@@ -245,8 +266,8 @@ const handleConfirmDelete = () => {
     <label>RETURNED</label>
   </div>
   <div className="modal-button-group">
-    <Button name="Update" className="table-btn" onClick={handleConfirmEdit} />
-    <Button name="Cancel" className="table-btn" onClick={() => setIsEditModalOpen(false)} />
+    <Button name="Update" className="modal-btn" onClick={handleConfirmEdit} />
+    <Button name="Cancel" className="modal-btn" onClick={() => setIsEditModalOpen(false)} />
   </div>
 </Modal>
 
@@ -263,12 +284,12 @@ const handleConfirmDelete = () => {
         <div className="modal-button-group">
           <Button
             name="Delete"
-            className="table-btn"
+            className="modal-btn"
             onClick={handleConfirmDelete}
           />
           <Button
             name="Cancel"
-            className="table-btn"
+            className="modal-btn"
             onClick={() => setIsDeleteModalOpen(false)}
           />
         </div>

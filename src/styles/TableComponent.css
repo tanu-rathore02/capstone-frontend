@@ -1,126 +1,105 @@
+.table-container {
+  width: 100%;
+  overflow-x: auto; 
+  display: block; 
+}
 
-   .table-container {
-    width: 100%;
-    /* padding-left: 0.5%; */
-  }
-  
-  .table-component {
-    width: 100%; 
-    border-collapse: collapse;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    /* table-lay?out: fixed; */
-  }
-  
-  .table-component thead {
-    background-color: #3a3043; 
-    color: #fff;
-  }
-  
-  .table-component th {
-    padding: 12px 15px;
-    text-align: left;
+.table-component {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  table-layout: fixed; 
+  min-width: 1000px; 
+}
+
+.table-component thead {
+  background-color: #3a3043;
+  color: #fff;
+}
+
+.table-component th {
+  padding: 1% 0.5%;
+  text-align: left;
+  white-space: nowrap; 
+}
+
+.table-component td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  padding: 1% 0.5%;
+  text-align: left;
+}
+
+.table-component tbody tr {
+  background-color: #E2D6DF;
+  backdrop-filter: blur(10px);
+}
+
+.table-component tbody tr:nth-child(even) {
+  background-color: #fffdfe;
+}
+
+.table-component td div {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1%;
+}
+
+.pagination-controls {
+  margin-top: 1.5%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pagination-controls button {
+  background-color: #796987;
+  color: #fff;
+  border: none;
+  padding: 0.5% 1%;
+  margin: 0 0.5%;
+  cursor: pointer;
+  border-radius: 9%;
+  transition: background-color 0.3s ease;
+}
+
+.pagination-controls button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination-controls span {
+  margin: 0 1%;
+  color: #3a3043;
+  font-weight: bold;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  background-color: #6d4b78;
+}
+
+@media (max-width: 768px) {
+  .table-component th, .table-component td {
+    padding: 1% 1%;
   }
 
-  .table-component td {
-    overflow: hidden;
-    overflow-x: ellipsis;
-    padding: 12px 15px;
-    text-align: left;
-  }
-
-  
-  
-  
-  .table-component tbody tr {
-    background-color: #E2D6DF; 
-    backdrop-filter: blur(10px);
-  }
-  
-  .table-component tbody tr:nth-child(even) {
-    background-color: #fffdfe; 
-  }
-  
-  
-  
   .table-component td div {
-    display: flex;
-    justify-content: flex-start; 
-    align-items: center; 
-    gap: 10px;
+    gap: 0.5%;
   }
 
   .pagination-controls {
-    margin-top: 15px;
-    display: flex;
-    justify-content: center; 
-    align-items: center;
-  }
-  
-  .pagination-controls button {
-    background-color:#796987; 
-    color: #fff;
-    border: none;
-    padding: 8px 16px;
-    margin: 0 5px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .pagination-controls button:disabled {
-    background-color: #ccc; 
-    cursor: not-allowed;
-  }
-  
-  .pagination-controls span {
-    margin: 0 10px;
-    color: #3a3043; 
-    font-weight: bold;
-  }
-  
-  .pagination-controls button:hover:not(:disabled) {
-    background-color: #6d4b78; 
-  }
- 
-  .dropdown-container {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .dropdown-menu {
-    display: flex;
-    flex-direction: column; 
-    position: absolute;
-    left: 0;   
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    padding: 8px 0;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-    min-width: 150px;
-  }
-  
-  
-  .dropdown-btn {
-    width: 100%; 
-    padding: 10px 15px;
-    background-color: #fff;
-    border: none;
-    text-align: left;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .dropdown-btn:hover {
-    background-color: #f1f1f1;
+    margin-top: 1%;
   }
 
-  .three-dots-btn {
-    background-color: transparent;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    padding: 0;
+  .pagination-controls button {
+    padding: 0.8% 1.5%;
+    margin: 0 0.3%;
+    border-radius: 0.3%;
   }
-  
+
+  .pagination-controls span {
+    margin: 0 0.5%;
+  }
+}

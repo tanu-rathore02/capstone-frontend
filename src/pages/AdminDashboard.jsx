@@ -100,7 +100,7 @@ function AdminDashboard({showPagination = false}) {
       </div>
       <h2 className="heading">Registered Users</h2>
       <TableComponent columns={columns} data={data}/>
-      <Link to='/users'>Browse all users</Link>
+      <Link to='/users' className="link">Browse all users</Link>
     </div>
   );
 }

@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { getRequest, deleteRequest, putRequest } from "../api/ApiManager"; 
-import { GET_CATEGORY, DELETE_CATEGORY, UPDATE_CATEGORY } from "../api/ApiConstants"; 
-import TableComponent from "./TableComponent";
-import Modal from "./Modal";
-import Button from "./Button";
+import { getRequest, deleteRequest, putRequest } from "../../api/ApiManager"; 
+import { GET_CATEGORY, DELETE_CATEGORY, UPDATE_CATEGORY } from "../../api/ApiConstants"; 
+import TableComponent from "../../components/TableComponent";
+import editIcon from "../../assets/editIcon.svg"
+import deleteIcon from "../../assets/deleteIcon.svg";
+
+import Modal from "../../components/Modal";
+import Button from "../../components/Button";
 
 function CategoryTable({ showPagination = true, refresh, searchTerm }) {
   const [data, setData] = useState([]);
@@ -131,12 +134,14 @@ function CategoryTable({ showPagination = true, refresh, searchTerm }) {
         <div>
           <Button
             className="table-btn"
-            name="Edit"
+            imageSrc={editIcon}
+            altText= "edit"
             onClick={() => handleEdit(row)}
           />
           <Button
             className="table-btn"
-            name="Delete"
+            imageSrc={deleteIcon}
+            altText="delete"
             onClick={() => handleDelete(row)}
           />
         </div>
@@ -200,15 +205,16 @@ function CategoryTable({ showPagination = true, refresh, searchTerm }) {
         >
           <label htmlFor="categoryName">Category Name</label>
           <input
+          id="categoryName"
             type="text"
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
           />
           <div className="modal-button-group">
-            <Button name="Update" className="table-btn" />
+            <Button name="Update" className="modal-btn" />
             <Button
               name="Cancel"
-              className="table-btn"
+              className="modal-btn"
               onClick={() => setIsEditModalOpen(false)}
             />
           </div>
@@ -233,12 +239,12 @@ function CategoryTable({ showPagination = true, refresh, searchTerm }) {
         <div className="modal-button-group">
           <Button
             name="Delete"
-            className="table-btn"
+            className="modal-btn"
             onClick={handleConfirmDelete}
           />
           <Button
             name="Cancel"
-            className="table-btn"
+            className="modal-btn"
             onClick={() => setIsConfirmDeleteModalOpen(false)}
           />
         </div>

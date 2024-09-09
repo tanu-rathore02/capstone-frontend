@@ -18,8 +18,8 @@ axios.interceptors.response.use(
 );
 
 
-export const postRequestWithoutAuth = (api, payloads, callback) => {
-  axios
+export const postRequestWithoutAuth = async (api, payloads, callback) => {
+  await axios
     .post(BASE_URL + api, payloads)
     .then((res) => {
       if (res?.status === 200 || res?.status === 201) {
@@ -32,8 +32,8 @@ export const postRequestWithoutAuth = (api, payloads, callback) => {
 };
 
 
-export const postRequest = (api, payloads, callback) => {
-  axios
+export const postRequest =  async(api, payloads, callback) => {
+   await axios
     .post(BASE_URL + api, payloads, {
       headers: {
         Authorization: getToken(), 
@@ -50,8 +50,8 @@ export const postRequest = (api, payloads, callback) => {
 };
 
 
-export const getRequest = (api, callback) => {
-  axios
+export const getRequest = async (api, callback) => {
+ await axios
     .get(BASE_URL + api, {
       headers: {
         Authorization: getToken(), 
@@ -68,8 +68,8 @@ export const getRequest = (api, callback) => {
 };
 
 
-export const putRequest = (api, payload, callback) => {
-  axios
+export const putRequest = async (api, payload, callback) => {
+  await axios
     .put(BASE_URL + api, payload, {
       headers: {
         Authorization:  getToken(),
@@ -86,8 +86,8 @@ export const putRequest = (api, payload, callback) => {
 };
 
 
-export const deleteRequest = (api, callback) => {
-  axios
+export const  deleteRequest = async (api, callback) => {
+ await axios
     .delete(BASE_URL + api, {
       headers: {
         Authorization:  getToken(), 

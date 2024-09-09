@@ -17,3 +17,77 @@
     grid-column: 2;
     grid-row: 2;
 }
+
+@media (max-width: 768px) {
+    .hoc-container {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto; 
+    }
+  
+    .nav-container {
+      grid-column: 1; 
+      grid-row: 1; 
+      height:auto; 
+      box-shadow: none; 
+      width: 100%; 
+    }
+  
+    .header-container {
+      grid-column: 1;
+      grid-row: 2; 
+    }
+  
+    .component-container {
+      grid-column: 1; 
+      grid-row: 3; 
+    }
+  
+    .header {
+      height: 12vh; 
+      padding: 0 21%;
+      box-shadow: 0px 0.3% 0.7% rgba(0, 0, 0, 0.2); 
+    }
+  
+    .header h1 {
+      font-size: 3vw; 
+      margin-left: 2%; 
+      margin-right: 3%; 
+    }
+  
+    .header-btn {
+      padding-right: 5%; 
+    }
+  
+    .navbar-container {
+ 
+      width: 20%; 
+      box-shadow: none; 
+      position: fixed; 
+      top: 0;
+      left: 0; 
+      z-index: 1000; 
+    }
+  
+    .navbar {
+      margin-top: 1rem; 
+      width: 100%; 
+    }
+  
+    .navbar ul {
+      padding: 0;
+      width: 100%; 
+    }
+  
+    .navbar a {
+      font-size: 1rem; 
+      padding: 0.8rem; 
+    }
+  
+    .icon {
+      width: 1.5rem; 
+      height: 1.5rem; 
+      margin-right: 0.8rem; 
+      margin-left: 0.8rem; 
+    }
+  }
+  
