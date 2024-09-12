@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Header from '../components/Header';
+
 import HocWrapper from '../components/HocWrapper';
 import Button from '../components/Button';
 import Searchbar from '../components/Searchbar';
@@ -12,7 +13,7 @@ import Modal from '../components/Modal';
 import { postRequest } from '../api/ApiManager';
 import { CREATE_USER } from '../api/ApiConstants';
 
-function Users() {
+function Users({setLoading}) {
  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState('');
@@ -24,6 +25,7 @@ function Users() {
   const [errors, setErrors] = useState("");
   const [refresh, setRefresh] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); 
+  const [isMessage, setIsMessage] = useState(false);
 
   const handleButtonClick = () => {
     setIsModalOpen(true);
@@ -43,26 +45,31 @@ function Users() {
       email: "",
       
     });
+    setIsMessage(false);
   };
 
   
   const validateForm = () => {
     const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;
 
+
     if (!name || !mobileNumber || !email) {
       setMessage("Please fill all the fields!");
       setIsError(true);
+      setIsMessage(true);
       return false;
     }
     if (specialCharacterRegex.test(name) || specialCharacterRegex.test(mobileNumber)) {
       setMessage("Username cannot contain special characters!");
       setIsError(true);
+      setIsMessage(true);
       return false;
     }
    
     if (!email) {
       setMessage("Email is required.");
       setIsError(true);
+      setIsMessage(true);
       return false;
     } else {
       let atIndex = email.indexOf('@');
@@ -71,15 +78,18 @@ function Users() {
       if (atIndex === -1 || dotIndex === -1 || email.slice(dotIndex) !== ".com" || dotIndex < atIndex) {
         setMessage("Invalid email format. Domain must end with .com");
         setIsError(true);
+        setIsMessage(true);
         return false;
       }
     }
 
     if (!/^\d+$/.test(mobileNumber)) {
       setMessage("Phone number must contain only digits.");
+      setIsMessage(true);
       return false;
     }else if (mobileNumber.length <10){
       setMessage("Phone number must be 10 digits long");
+      setIsMessage(true);
       return false;
     }
     return true;
@@ -89,7 +99,7 @@ function Users() {
   const handleUserSubmit = async (e) => {
     e.preventDefault();
 
-    
+   
     if (!validateForm()) {
       return;
     }
@@ -106,7 +116,8 @@ function Users() {
         if (response?.status === 200 || 201){
           setMessage("User Added Successfully!");
           setIsError(false);
-          console.log("Book created:", response.data);
+          setIsMessage(true);
+         
         setTimeout(() => {
           handleCloseModal();
         }, 2000);
@@ -115,10 +126,12 @@ function Users() {
         }else if (response?.status === 409) {
           setMessage("User with this credentials already exists!");
           setIsError(true);
+          setIsMessage(true);
         } else {
-          console.error("Error creating user", response?.data);
+         
           setMessage("Failed to add user. Please try again");
           setIsError(true);
+          setIsMessage(true);
         }
     });
   };
@@ -128,6 +141,8 @@ function Users() {
     setSearchTerm(term); 
   };
 
+  const modalDimension = isMessage ? {height: "600", width:"400px"} : {height: "550", width:"400px"};
+  
   return (
     <div className='pages-container'>
       <div className='controls-container'>
@@ -136,12 +151,14 @@ function Users() {
       </div>
       
       
-      <UsersTable showPagination={true} refresh={refresh} searchTerm={searchTerm}/>
+      <UsersTable showPagination={true} refresh={refresh} searchTerm={searchTerm} setLoading={setLoading}/>
       
       <Modal
         title="Add User"
         isOpen={isModalOpen}
         onClose={handleCloseModal}
+        height={modalDimension.height}
+        width={modalDimension.width}
       >
         {message && (
           <p className={isError ? "error-message" : "success-message"}>

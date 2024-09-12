@@ -1,19 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar";
 import Header from "../../components/Header";
 import HocWrapper from "../../components/HocWrapper";
 import Button from "../../components/Button";
 import Searchbar from "../../components/Searchbar";
-import CategoryTable from "./CategoryTable"
-import Modal from "../../components/Modal"
+import CategoryTable from "./CategoryTable";
+import Modal from "../../components/Modal";
 import { postRequest } from "../../api/ApiManager";
 import { CREATE_CATEGORY } from "../../api/ApiConstants";
 import "../../styles/Pages.css";
 
-function Categories() {
+function Categories({setLoading}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categoryName, setCategoryName] = useState("");
   const [message, setMessage] = useState("");
+  const [isMessage, setIsMessage] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isError, setIsError] = useState(false);
@@ -26,6 +27,7 @@ function Categories() {
     setIsModalOpen(false);
     setCategoryName("");
     setMessage("");
+    setIsMessage(false);
   };
 
   const handleCategorySubmit = (e) => {
@@ -35,15 +37,19 @@ function Categories() {
 
     if (categoryName.trim() === "") {
       setMessage("Category name cannot be empty!");
+      setIsMessage(true);
       setIsError(true);
       return;
     }
 
     if (specialCharacterRegex.test(categoryName)) {
       setMessage("Category name cannot contain special characters!");
+      setIsMessage(true);
       setIsError(true);
       return;
     }
+
+    
 
     const categoryData = {
       categoryName: categoryName,
@@ -52,26 +58,38 @@ function Categories() {
     postRequest(CREATE_CATEGORY, categoryData, (response) => {
       if (response?.status === 200 || response?.status === 201) {
         setMessage("Category added successfully!");
+        setIsMessage(true);
         setIsError(false);
-        setRefresh((prev) => !prev); 
+        setRefresh((prev) => !prev);
         setTimeout(() => {
           setIsModalOpen(false);
           setCategoryName("");
         }, 2000);
-      }else if (response?.status === 409) { 
+      } else if (response?.status === 409) {
         setMessage("Category with this name already exists!");
+        setIsMessage(true);
+
         setIsError(true);
       } else {
         setMessage("Failed to add category. Please try again");
+        setIsMessage(true);
+
         setIsError(true);
-        console.error("Error creating category", response?.data);
-      } 
+      
+      }
     });
   };
 
   const handleSearch = (term) => {
     setSearchTerm(term);
   };
+  const modalDimension = isMessage
+    ? { height: "310px", width: "300px" }
+    : { height: "280px", width: "300px" };
+
+    useEffect(()=>{
+      // alert(setLoading)
+    },[])
 
   return (
     <div className="pages-container">
@@ -83,14 +101,21 @@ function Categories() {
           onClick={handleButtonClick}
         />
       </div>
-      <CategoryTable showPagination={true} refresh={refresh} searchTerm={searchTerm} />
+      <CategoryTable
+        showPagination={true}
+        refresh={refresh}
+        searchTerm={searchTerm}
+        setLoading={setLoading}
+      />
 
       <Modal
         title="Add Category"
         isOpen={isModalOpen}
         onClose={handleCloseModal}
+        height={modalDimension.height}
+        width={modalDimension.width}
       >
-         {message && (
+        {message && (
           <p className={isError ? "error-message" : "success-message"}>
             {message}
           </p>

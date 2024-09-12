@@ -15,7 +15,7 @@ function IssuanceHistoryByUser() {
         headers: { Authorization: token },
       });
 
-     console.log('Issuance Data:', response.data);
+ 
 
       if (response.data && Array.isArray(response.data)) {
         setData(response.data.map((issuance, index) => ({
@@ -27,11 +27,11 @@ function IssuanceHistoryByUser() {
           issuanceType: issuance.issuanceType || 'N/A',
         })));
       } else {
-        console.error('Unexpected response format:', response);
+      
         setData([]); 
       }
     } catch (error) {
-      console.error('Error fetching issuance history', error);
+   
       setData([]);
     }
   };
@@ -51,7 +51,7 @@ function IssuanceHistoryByUser() {
 
   return (
     <div className="issuance-history-container">
-      <h2>Issuance History</h2>
+      <h2 style={{ textAlign: 'center' }}>Issuance History</h2>
       <TableComponent columns={columns} data={data} />
     </div>
   );

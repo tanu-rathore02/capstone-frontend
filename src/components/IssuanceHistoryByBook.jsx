@@ -11,13 +11,12 @@ function IssuanceHistoryByUser() {
   const fetchIssuanceHistory = async () => {
   
       const token = localStorage.getItem('token');
-      console.log('Book ID:', bookId); 
+  
 
       const response = await axios.get(`http://localhost:8080/api/issuances/book/${bookId}`, {
         headers: { Authorization: token },
       });
 
-      console.log('API Response:', response); 
 
       if (response.data && Array.isArray(response.data)) {
         setData(response.data.map((issuance, index) => ({
@@ -29,7 +28,6 @@ function IssuanceHistoryByUser() {
           issuanceType: issuance.issuanceType || 'N/A',
         })));
       } else {
-        console.error('Unexpected response format:', response);
         setData([]);
       }
    
@@ -53,8 +51,9 @@ function IssuanceHistoryByUser() {
 
   return (
     <div className="issuance-history-container">
-      <h2>Issuance History</h2>
-      <TableComponent columns={columns} data={data} />
+     <h2 style={{ textAlign: 'center' }}>Issuance History</h2>
+      <TableComponent 
+        columns={columns} data={data} />
     </div>
   );
 }

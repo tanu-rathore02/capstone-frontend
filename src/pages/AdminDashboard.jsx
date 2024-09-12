@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 import { getRequest } from "../api/ApiManager";
 import { GET_BOOK_COUNT, GET_USER_COUNT, GET_CATEGORY_COUNT, GET_INHOUSE_READER_COUNT,GET_USER } from "../api/ApiConstants"; 
 
-function AdminDashboard({showPagination = false}) {
+function AdminDashboard({showPagination = false, setLoading}) {
 
   const [bookCount, setBookCount] = useState(0);
   const [userCount, setUserCount] = useState(0);
@@ -57,7 +57,8 @@ function AdminDashboard({showPagination = false}) {
   };
 
 
-  const fetchData = () => {
+  const fetchData = () => { 
+    setLoading(true);
     getRequest(`${GET_USER}?page=0&size=4&sortBy=id&sortDir=asc&search=`, (response) => {
       if (response && response.data) {
         setData(
@@ -73,6 +74,7 @@ function AdminDashboard({showPagination = false}) {
         );
       }
     });
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -94,13 +96,16 @@ function AdminDashboard({showPagination = false}) {
     <div className="dashboard-container">
       <div className="cards-container">
         <Card name="Total Users" value={userCount} image={totalUsers} />
-        <Card name="In-house Readers" value={reader} image={inHouseReaders} />
+        <Card name="In-House Readers" value={reader} image={inHouseReaders} />
         <Card name="Total Categories" value={categoryCount} image={totalBooks} />
         <Card name="Total Books" value={bookCount} image={issuedBooks} />
       </div>
       <h2 className="heading">Registered Users</h2>
-      <TableComponent columns={columns} data={data}/>
+      <div  className="admin-table">
+        <TableComponent columns={columns} data={data}/>
       <Link to='/users' className="link">Browse all users</Link>
+      </div>
+      
     </div>
   );
 }

@@ -7,6 +7,7 @@ import editIcon from "../assets/editIcon.svg";
 import deleteIcon from "../assets/deleteIcon.svg";
 import assignIcon from "../assets/assignIcon.svg";
 import historyIcon from "../assets/historyIcon.svg";
+import Toast from "./Toast";
 import {
   GET_BOOK,
   UPDATE_BOOK,
@@ -22,7 +23,12 @@ import {
   postRequest,
 } from "../api/ApiManager";
 
-function BooksTable({ showPagination = true, refresh, searchTerm }) {
+function BooksTable({
+  showPagination = true,
+  refresh,
+  searchTerm,
+  setLoading,
+}) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -34,7 +40,9 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
   const [status, setStatus] = useState("");
   const [issuanceType, setIssuanceType] = useState("");
   const [returnDate, setReturnDate] = useState("");
+  const [issueDate, setIssueDate] = useState("");
   const [username, setUsername] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
   const [id, setId] = useState();
   const [title, setTitle] = useState();
   const [author, setAuthor] = useState("");
@@ -43,18 +51,24 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
   const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState();
   const [isError, setIsError] = useState(false);
+  const [isMessage, setIsMessage] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toast, setToast] = useState("");
 
   const navigate = useNavigate();
 
   const fetchData = () => {
+    setLoading(true);
     getRequest(
-      `${GET_BOOK}?page=${currentPage}&size=8&sortBy=id&sortDir=desc&search=${searchTerm || ""}`,
+      `${GET_BOOK}?page=${currentPage}&size=7&sortBy=id&sortDir=desc&search=${
+        searchTerm || ""
+      }`,
       (response) => {
         if (response?.status === 200 || 201) {
           setData(
             response.data.content.map((book, index) => ({
               id: book.id,
-              sno: index + 1 + currentPage * 8,
+              sno: index + 1 + currentPage * 7,
               title: book.title,
               author: book.author,
               availability: book.availability,
@@ -62,8 +76,9 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
             }))
           );
           setTotalPages(response.data.totalPages);
+          setLoading(false);
         } else {
-          console.error("Error fetching the books", response?.error);
+          setLoading(false);
         }
       }
     );
@@ -77,8 +92,6 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
     getRequest(`${GET_ALL_USER}`, (response) => {
       if (response?.status === 200 || 201) {
         setUsers(response.data);
-      } else {
-        console.error("Error fetching users", response?.error);
       }
     });
   };
@@ -92,8 +105,6 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
       getRequest(GET_ALL_CATEGORY, (response) => {
         if (response?.status === 200) {
           setCategories(response.data);
-        } else {
-          console.error("Error fetching categories", response?.data);
         }
       });
     };
@@ -105,48 +116,89 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
   const validateEditForm = () => {
     const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;
 
-    if (!title || !author || !availability || !categoryId) {
+    const trimmedTitle = title.trim();
+    const trimmedAuthor = author.trim();
+
+    if (!trimmedTitle || !trimmedAuthor || !availability || !categoryId) {
       setMessage("Please fill all the fields!");
       setIsError(true);
+      setIsMessage(true);
       return false;
     }
-    if (specialCharacterRegex.test(title) || specialCharacterRegex.test(author)) {
+    if (
+      specialCharacterRegex.test(title) ||
+      specialCharacterRegex.test(author)
+    ) {
       setMessage("Title and Author cannot contain special characters!");
       setIsError(true);
+      setIsMessage(true);
       return false;
     }
-    if (availability < 0) {
+    const availabilityNumber = parseFloat(availability);
+
+    if (isNaN(availabilityNumber)) {
+      setMessage("Availability must be a valid number!");
+      setIsError(true);
+      setIsMessage(true);
+      return false;
+    }
+
+    if (availabilityNumber < 0) {
       setMessage("Availability cannot be a negative number!");
       setIsError(true);
+      setIsMessage(true);
       return false;
     }
+
+    if (availabilityNumber % 1 !== 0) {
+      setMessage("Availability cannot be a decimal value!");
+      setIsError(true);
+      setIsMessage(true);
+      return false;
+    }
+
     return true;
   };
-
   const validateAssignmentForm = () => {
-    const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;
+    const issueDateObj = new Date(issueDate);
+    const returnDateObj = new Date(returnDate);
 
-    if (!username || !status || !issuanceType) {
-      setMessage("Please fill all the fields!");
+    if (!returnDate || !issuanceType || !mobileNumber) {
+      setMessage("Please fill out all the fields!");
       setIsError(true);
+      setIsMessage(true);
       return false;
     }
-    if (specialCharacterRegex.test(username)) {
-      setMessage("Username cannot contain special characters!");
+
+    if (returnDateObj < issueDateObj) {
+      setMessage("Return date cannot be earlier than Issue Date!");
       setIsError(true);
+      setIsMessage(true);
       return false;
     }
+
     return true;
   };
 
   //Assignment Functions
   const handleAssign = (book) => {
+    if (book.availability === 0) {
+      setToast("Book is not available at this moment");
+      setShowToast(true);
+      console.log("toast opened");
+      return; // Prevent opening the modal
+    }
+
     setId(book.id);
+    console.log(id);
     setTitle(book.title);
     setIsAssignModalOpen(true);
     setMessage("");
+    setIsMessage(false);
+    const now = new Date();
+    const formattedIssueDate = now.toISOString().slice(0, 16);
+    setIssueDate(formattedIssueDate);
   };
-
   const handleAssignmentSubmit = async (e) => {
     e.preventDefault();
 
@@ -154,14 +206,17 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
       return;
     }
 
+    const formattedReturnDate = returnDate
+      ? new Date(returnDate).toISOString()
+      : "";
+
     const formattedStatus = status.toUpperCase();
     const formattedIssuanceType = issuanceType
       .replace(/\s+/g, "-")
       .toUpperCase();
-    const formattedReturnDate = returnDate ? `${returnDate}T00:00:00` : "";
 
     const issuanceData = {
-      userId: username,
+      userId: mobileNumber,
       bookId: id,
       status: formattedStatus,
       issuanceType: formattedIssuanceType,
@@ -170,20 +225,26 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
 
     postRequest(CREATE_ISSUANCE, issuanceData, (response) => {
       if (response?.status === 200 || 201) {
-        setMessage("Issuance added successfully!");
+        setMessage(`Issuance added successfully!`);
         setIsError(false);
+        setIsMessage(true);
         setStatus("");
         setIssuanceType("");
         setReturnDate("");
         setUsername("");
+        setMobileNumber("");
         setTimeout(() => {
           setIsAssignModalOpen(false);
-          navigate('/issuances')
+          navigate("/issuances");
         }, 2000);
-      } else {
-        setMessage("Failed to add Issuance. Please try again");
+      } else if (response?.status === 400 || response?.status === 409) {
+        setMessage("Failed to add issuance. Please try again");
         setIsError(true);
-        console.error("Error creating category", response?.data);
+        setIsMessage(true);
+      } else {
+        setMessage("An unexpected error occurred. Please try again");
+        setIsError(true);
+        setIsMessage(true);
       }
     });
   };
@@ -197,6 +258,7 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
     setCategoryId(book.categories || "");
     setIsEditModalOpen(true);
     setMessage("");
+    setIsMessage(false);
   };
 
   const handleUpdateBook = async () => {
@@ -204,8 +266,10 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
       return;
     }
 
+    const trimmedTitle = title.trim();
+
     const updateData = {
-      title: title,
+      title: trimmedTitle,
       author: author,
       categoryId: categoryId,
       availability: availability,
@@ -213,9 +277,9 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
 
     putRequest(`${UPDATE_BOOK}${selectedBook.id}`, updateData, (response) => {
       if (response?.status === 200 || response?.status === 201) {
-        console.log("Book updated successfully", updateData);
         setMessage("Book updated successfully!");
         setIsError(false);
+        setIsMessage(true);
         setTimeout(() => {
           setIsEditModalOpen(false);
           setSelectedBook(null);
@@ -228,9 +292,11 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
       } else if (response?.status === 409) {
         setMessage("A book with this title already exists!");
         setIsError(true);
+        setIsMessage(true);
       } else {
         setMessage("Error updating book!");
         setIsError(true);
+        setIsMessage(true);
         console.error("Error updating book", response?.data);
       }
     });
@@ -241,22 +307,25 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
     setSelectedBook(book);
     setIsDeleteModalOpen(true);
     setMessage("");
+    setIsMessage(false);
   };
 
   const handleConfirmDelete = async () => {
-    deleteRequest(`${DELETE_BOOK}title/${selectedBook.title}`, (response) => {
+    deleteRequest(`${DELETE_BOOK}${selectedBook.id}`, (response) => {
       if (response?.status === 200) {
         setMessage("Book deleted successfully!");
         setIsError(false);
+        setIsMessage(true);
+
         setTimeout(() => {
           setIsDeleteModalOpen(false);
           setSelectedBook(null);
         }, 2000);
         fetchData();
-      } else {
+      } else if (response?.status === 405) {
         setMessage("Error deleting Book! Book from this category is issued");
         setIsError(true);
-        console.error("Error deleting category", response?.data);
+        setIsMessage(true);
       }
     });
   };
@@ -287,7 +356,7 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
     {
       header: "Action",
       Cell: ({ row }) => (
-        <div>
+        <div className="table-component-actions">
           <Button
             className="table-btn"
             imageSrc={editIcon}
@@ -299,6 +368,7 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
             imageSrc={deleteIcon}
             active={true}
             onClick={() => handleDelete(row)}
+            disabled={row.availability === 0}
           />
           <Button
             className="table-btn"
@@ -317,28 +387,34 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
     },
   ];
 
+  const modalDimension = isMessage
+    ? { height: "600", width: "400px" }
+    : { height: "550", width: "400px" };
+  const deleteModalDimension = isMessage
+    ? { height: "280px", width: "300px" }
+    : { height: "320px", width: "300px" };
   return (
     <div className="table-container">
       {data.length > 0 ? (
         <>
-      <TableComponent columns={columns} data={data} />
-      {showPagination && (
-        <div className="pagination-controls">
-          <button onClick={handlePreviousPage} disabled={currentPage === 0}>
-            Previous
-          </button>
-          <span>
-            Page {currentPage + 1} of {totalPages}
-          </span>
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages - 1}
-          >
-            Next
-          </button>
-        </div>
-      )}
-       </>
+          <TableComponent columns={columns} data={data} />
+          {showPagination && (
+            <div className="pagination-controls">
+              <button onClick={handlePreviousPage} disabled={currentPage === 0}>
+                Previous
+              </button>
+              <span>
+                Page {currentPage + 1} of {totalPages}
+              </span>
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages - 1}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         <p className="no-data-message">No data available</p>
       )}
@@ -348,6 +424,8 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         title="Edit Book"
+        height={modalDimension.height}
+        width={modalDimension.width}
       >
         {message && (
           <p className={isError ? "error-message" : "success-message"}>
@@ -386,7 +464,7 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
           </select>
           <label htmlFor="availability">Availability</label>
           <input
-            type="number"
+            type="text"
             value={availability}
             onChange={(e) => setAvailability(e.target.value)}
           />
@@ -406,8 +484,10 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         title="Delete Book"
+        height={deleteModalDimension.height}
+        width={deleteModalDimension.width}
       >
-         {message && (
+        {message && (
           <p className={isError ? "error-message" : "success-message"}>
             {message}
           </p>
@@ -434,9 +514,10 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
         title="Assign Book"
         isOpen={isAssignModalOpen}
         onClose={() => setIsAssignModalOpen(false)}
-
+        height={modalDimension.height}
+        width={modalDimension.width}
       >
-         {message && (
+        {message && (
           <p className={isError ? "error-message" : "success-message"}>
             {message}
           </p>
@@ -449,27 +530,13 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
             readOnly
             style={{ color: "black" }}
           />
+          <label htmlFor="mobileNumber">User:</label>
 
-          <label htmlFor="username">User:</label>
-          <select
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          >
-            <option value="">Select User</option>
-            {users.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.name}
-              </option>
-            ))}
+          <label htmlFor="status">Status:</label>
+          <select value={status} onChange={(e) => setStatus(e.target.value)}>
+            <option value="">Select Status</option>
+            <option value="ISSUED">Issued</option>
           </select>
-
-          <label htmlFor="status">Status</label>
-          <input
-            type="text"
-            value="ISSUED"
-            readOnly
-            style={{ color: "black" }}
-          />
 
           <label htmlFor="issuanceType">Issuance Type:</label>
           <select
@@ -480,13 +547,15 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
             <option value="IN-HOUSE">IN-HOUSE</option>
             <option value="TAKE AWAY">TAKE-AWAY</option>
           </select>
-          <label htmlFor="returnDate">Returned At</label>
+          <label htmlFor="returndate">Returned At</label>
           <input
-            type="date"
+            label="Return Date"
+            type="datetime-local"
             value={returnDate}
+            min={issueDate}
             onChange={(e) => setReturnDate(e.target.value)}
           />
-          {/* {errorMessage && <p>{errorMessage}</p>} */}
+
           <div className="modal-button-group">
             <Button className="modal-btn" type="submit" name="Assign" />
             <Button
@@ -502,4 +571,3 @@ function BooksTable({ showPagination = true, refresh, searchTerm }) {
 }
 
 export default BooksTable;
-

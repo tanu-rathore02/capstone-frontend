@@ -34,14 +34,12 @@
   filter: invert(34%) sepia(54%) saturate(3538%) hue-rotate(256deg) brightness(90%) contrast(101%);
 }
 
-.error-message {
-  position: relative;
-  top: 70%;
-  left: 0;
-  font-size: 80%;
+.search-error-message {
   color: red;
-  z-index: 1;
-  width: 60%;
+  font-size: 12px;
+  margin-top: 5px;
+  margin-left: 10px;
+  display: block;
 }
 
 

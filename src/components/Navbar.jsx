@@ -68,7 +68,7 @@ function Navbar({ role }) {
                 to="/userDashboard"
                 className={({ isActive }) => (isActive ? 'active-link' : '')}
               >
-                <img src={dashboardIcon} alt="User Dashboard" className="icon" /> User Dashboard
+                <img src={dashboardIcon} alt="User Dashboard" className="icon" /> Dashboard
               </NavLink>
             </li>
           )}

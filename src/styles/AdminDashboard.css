@@ -17,7 +17,7 @@ body {
 }
 
 .dashboard-container .table-container {
-  width: 100%;
+  width: auto;
 }
  
 .heading{
@@ -30,13 +30,11 @@ body {
 
  }
  @media (max-width: 768px) {
-  body {
-    height: auto;
-    overflow-y: auto;
-  }
 
   .dashboard-container {
-    padding: 4% 2% 3% 22%;
+    padding: 4%;
+    
+    
   }
 
   .cards-container {
@@ -47,11 +45,18 @@ body {
   .dashboard-container .table-container {
     overflow-x: auto;
     width: 100%;
-    display: none;
+   
   }
 
 
   .heading , .link{
-   display: none;
+    padding-top: 2%;
+ 
+  }
+
+  .admin-table{
+    overflow: auto;
+    max-width: 1000px;
+
   }
 }

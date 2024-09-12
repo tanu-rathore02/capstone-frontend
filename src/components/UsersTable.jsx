@@ -11,8 +11,8 @@ import Button from "./Button";
 import {
   getRequest,
   postRequest,
-  putRequest,
   deleteRequest,
+  patchRequest,
 } from "../api/ApiManager";
 import {
   GET_USER,
@@ -22,7 +22,7 @@ import {
   CREATE_ISSUANCE,
 } from "../api/ApiConstants";
 
-function UsersTable({ showPagination = true, refresh, searchTerm }) {
+function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -36,18 +36,23 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
   const [status, setStatus] = useState("");
   const [issuanceType, setIssuanceType] = useState("");
   const [returnDate, setReturnDate] = useState("");
+  const [issueDate, setIssueDate] = useState(''); 
   const [selectedUser, setSelectedUser] = useState(null);
   const [name, setName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const [message, setMessage] = useState();
   const [isError, setIsError] = useState(false);
+  const [isMessage, setIsMessage] = useState(false);
+
+
 
   //Get API
   const fetchData = () => {
+
+    setLoading(true);
     getRequest(
       `${GET_USER}?page=${currentPage}&size=8&sortBy=id&sortDir=desc&search=${
         searchTerm || ""
@@ -66,8 +71,10 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
             }))
           );
           setTotalPages(response.data.totalPages);
+          setLoading(false);
         } else {
-          console.error("Error fetching the books", response?.error);
+        
+          setLoading(false);
         }
       }
     );
@@ -82,8 +89,6 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
       getRequest(`${GET_ALL_BOOK}`, (response) => {
         if (response?.status === 200 || 201) {
           setBooks(response.data);
-        } else {
-          console.error("Error fetching books", response?.error);
         }
       });
     };
@@ -93,20 +98,25 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
   const validateEditForm = () => {
     const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;
 
-    if (!name || !mobileNumber || !email) {
+    const trimmedName = name.trim();
+
+    if (!trimmedName || !mobileNumber || !email) {
       setMessage("Please fill all the fields!");
       setIsError(true);
+      setIsMessage(true)
       return false;
     }
     if (specialCharacterRegex.test(name) || specialCharacterRegex.test(mobileNumber)) {
       setMessage("Username cannot contain special characters!");
       setIsError(true);
+      setIsMessage(true)
       return false;
     }
    
     if (!email) {
       setMessage("Email is required.");
       setIsError(true);
+      setIsMessage(true)
       return false;
     } else {
       let atIndex = email.indexOf('@');
@@ -115,15 +125,20 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
       if (atIndex === -1 || dotIndex === -1 || email.slice(dotIndex) !== ".com" || dotIndex < atIndex) {
         setMessage("Invalid email format. Domain must end with .com");
         setIsError(true);
+        setIsMessage(true)
         return false;
       }
     }
 
     if (!/^\d+$/.test(mobileNumber)) {
       setMessage("Phone number must contain only digits.");
+      setIsMessage(true)
+      setIsError(true);
       return false;
     }else if (mobileNumber.length <10){
       setMessage("Phone number must be 10 digits long");
+      setIsMessage(true);
+      setIsError(true);
       return false;
     }
     return true;
@@ -131,17 +146,21 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
 
 
   const validateAssignmentForm = () => {
-    const today = new Date().toISOString().split("T")[0]; 
+    const issueDateObj = new Date(issueDate); 
+    const returnDateObj = new Date(returnDate);
 
+    
     if (!returnDate || !status || !issuanceType) {
       setMessage("Please fill all the fields!");
       setIsError(true);
+      setIsMessage(true);
       return false;
     }
 
-    if (returnDate < today) {
+    if (returnDateObj < issueDateObj) {
       setMessage("Return date cannot be earlier than today!");
       setIsError(true);
+      setIsMessage(true);
       return false;
     }
 
@@ -154,6 +173,10 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
     setUserId(user.id);
     setIsAssignModalOpen(true);
     setMessage("");
+    setIsMessage(false);
+    const now = new Date();
+    const formattedIssueDate = now.toISOString().slice(0, 16);
+    setIssueDate(formattedIssueDate);
   };
 
   const handleAssignmentSubmit = (e) => {
@@ -168,21 +191,26 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
       .replace(/\s+/g, "-")
       .toUpperCase();
 
-    const formattedReturnDate = returnDate ? `${returnDate}T00:00:00` : "";
+      const formattedReturnDate = returnDate ? new Date(returnDate).toISOString() : "";
+
+   
 
     const issuanceData = {
       userId: userId,
-      bookId: bookname,
+      bookId: parseInt(bookname),
       status: formattedStatus,
       issuanceType: formattedIssuanceType,
       returnDate: formattedReturnDate,
     };
-
+ 
+ 
+ 
     postRequest(CREATE_ISSUANCE, issuanceData, (response) => {
       if (response?.status === 200 || response?.status === 201) {
-        console.log("Issuance created:", response.data);
+     
         setMessage("Issuance added successfully!");
         setIsError(false);
+        setIsMessage(true);
         setStatus("");
         setReturnDate("");
         setIssuanceType("");
@@ -194,13 +222,15 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
           navigate("/issuances");
         }, 2000);
       } else if (response?.status === 400 || response?.status === 409) {
-        console.error("Issuance creation failed:", response?.data);
+       
         setMessage("Failed to add issuance. Please try again");
         setIsError(true);
+        setIsMessage(true);
       } else {
-        console.error("Unexpected error:", response?.data);
+  
         setMessage("An unexpected error occurred. Please try again");
         setIsError(true);
+        setIsMessage(true);
       }
     });
   };
@@ -211,12 +241,16 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
     setName(user.name);
     setEmail(user.email);
     setMobileNumber(user.mobileNumber);
-    setPassword(user.password);
     setIsEditModalOpen(true);
     setMessage("");
+    setIsMessage(false);
+
+   
   };
 
-  const handleUpdateUser = () => {
+  const handleUpdateUser = (e) => {
+
+    e.preventDefault();
 
     if(!validateEditForm){
       return;
@@ -225,17 +259,17 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
       name,
       mobileNumber,
       email,
-      password,
       role: "ROLE_USER",
     };
 
-    putRequest(
+    patchRequest(
       `${UPDATE_USER}/${selectedUser.mobileNumber}`,
       updateData,
       (response) => {
         if (response?.status === 200) {
-          console.log("Book updated successfully", updateData);
+         
           setMessage("Book updated successfully!");
+          setIsMessage(true);
           setIsError(false);
           setTimeout(() => {
             setIsEditModalOpen(false);
@@ -248,10 +282,12 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
         } else if (response?.status === 409) {
           setMessage("A user with these credentials already exists!");
           setIsError(true);
+          setIsMessage(true);
         } else {
           setMessage("Error updating user details!");
           setIsError(true);
-          console.error("Error updating user details", response?.data);
+          setIsMessage(true);
+         
         }
       }
     );
@@ -262,19 +298,23 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
     setSelectedUser(user);
     setIsDeleteModalOpen(true);
     setMessage("");
+    setIsMessage(true);
   };
   const handleConfirmDelete = () => {
+ 
     deleteRequest(`${DELETE_USER}/${selectedUser.mobileNumber}`, (response) => {
       if (response?.status === 200) {
         setMessage("User deleted successfully!");
         setIsError(false);
+        setIsMessage(true);
         setIsDeleteModalOpen(false);
         setSelectedUser(null);
         fetchData();
-      } else{
-        setMessage("Error deleting Book! Book from this category is issued");
+      } else if ( response?.status === 405){
+        setMessage("Error deleting user. Book is issued to this");
         setIsError(true);
-        console.error("Error deleting category", response?.data);
+        setIsMessage(true);
+       
       }
     });
   };
@@ -304,7 +344,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
     {
       header: "Action",
       Cell: ({ row }) => (
-        <div>
+        <div className="table-component-actions">
           <Button
             className="table-btn"
             imageSrc={editIcon}
@@ -329,7 +369,13 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
       ),
     },
   ];
+  
+  useEffect(()=>{
+    // alert(setLoading)
+  },[])
 
+  const modalDimension = isMessage ? {height: "600", width:"400px"} : {height: "550", width:"400px"};
+  const deleteModalDimension = isMessage ? {height: "280", width:"300px"} : {height: "320", width:"300px"};
   return (
     <div className="table-container">
       {data.length > 0 ? (
@@ -361,7 +407,8 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
         title="Edit User"
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-       
+        height={modalDimension.height}
+        width={modalDimension.width}
       >
         {message && (
           <p className={isError ? "error-message" : "success-message"}>
@@ -387,12 +434,6 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
             value={mobileNumber}
             onChange={(e) => setMobileNumber(e.target.value)}
           />
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
           <div className="modal-button-group">
             <Button className="modal-btn" type="submit" name="Save" />
             <Button
@@ -409,6 +450,8 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
         title="Delete User"
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
+        height={deleteModalDimension.height}
+        width={deleteModalDimension.width}
        
       >
         {message && (
@@ -436,6 +479,8 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
         title="Assign Book"
         isOpen={isAssignModalOpen}
         onClose={() => setIsAssignModalOpen(false)}
+        height={modalDimension.height}
+        width={modalDimension.width}
        
       >
         {message && (
@@ -464,7 +509,6 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
           <select value={status} onChange={(e) => setStatus(e.target.value)}>
             <option value="">Select Status</option>
             <option value="ISSUED">Issued</option>
-            <option value="RETURNED">Returned</option>
           </select>
 
           <label htmlFor="issuanceType">Issuance Type:</label>
@@ -479,7 +523,8 @@ function UsersTable({ showPagination = true, refresh, searchTerm }) {
           <label htmlFor="returndate">Returned At</label>
           <input
             label="Return Date"
-            type="date"
+           type="datetime-local"
+           min={issueDate}
             value={returnDate}
             onChange={(e) => setReturnDate(e.target.value)}
           />

@@ -4,11 +4,12 @@ import Modal from "./Modal";
 import TableComponent from "./TableComponent";
 import "../styles/Modal.css";
 import editIcon from "../assets/editIcon.svg";
+import Toast from "./Toast";
 import deleteIcon from "../assets/deleteIcon.svg";
 import { getRequest, deleteRequest, putRequest } from "../api/ApiManager";
 import { GET_ISSUANCE,  DELETE_ISSUANCE, UPDATE_ISSUANCE, GET_ISSUANCE_BY_ID } from "../api/ApiConstants";
 
-function IssuancesTable({ showPagination = true, refresh, searchTerm }) {
+function IssuancesTable({ showPagination = true, refresh, searchTerm, setLoading }) {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -20,48 +21,57 @@ function IssuancesTable({ showPagination = true, refresh, searchTerm }) {
   const [returnDate, setReturnDate] = useState("");
   const [userId, setUserId] = useState("");
   const [bookId, setBookId] = useState("");
-  
+  const [message, setMessage] = useState();
+  const [isError, setIsError] = useState(false);
+  const [isMessage, setIsMessage] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toast, setToast] = useState('');
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).replace(",", ""); 
+  };
 
 
   
 const fetchData = () => {
-  const params = {
-    page: currentPage,
-    size: 5,
-    sortBy: "id",
-    sortDir: "asc",
-    search: searchTerm || "",
-  };
-
+  setLoading(true);
   getRequest(
-    `${GET_ISSUANCE}?page=${currentPage}&size=6&sortBy=id&sortDir=desc&search=${searchTerm || ""}`, 
+    `${GET_ISSUANCE}?page=${currentPage}&size=7&sortBy=id&sortDir=desc&search=${searchTerm || ""}`, 
     (response) => {
       if (response?.status === 200) {
         const issuances = response.data.content;
         issuances.forEach((issuance) => {
-          console.log("Issuance Data:", issuance);
+        
         });
 
         setData(
           issuances.map((issuance, index) => ({
             id: issuance.id,
-            sno: index + 1 + currentPage * 5,
+            sno: currentPage *7 + index + 1,
             users: issuance.users || {}, 
             books: issuance.books || {}, 
-            issueDate: issuance.issueDate,
-            returnDate: issuance.returnDate,
+            issueDate: formatDate(issuance.issueDate),
+            returnDate: formatDate(issuance.returnDate),
             status: issuance.status,
             issuanceType: issuance.issuanceType,
           }))
         );
         setTotalPages(response.data.totalPages);
+        setLoading(false);
       } else {
-        console.error("Error fetching issuances", response?.data);
+       
+        setLoading(false);
       }
     },
-    {
-      params, 
-    }
+   
   );
 };
 
@@ -69,9 +79,31 @@ useEffect(() => {
   fetchData();
 }, [currentPage, refresh, searchTerm]);
 
+const validateForm = () => {
+   
+  const currentDateTime = new Date();
+  const selectedReturnDate = new Date(returnDate)
+  
+  if (selectedReturnDate <= currentDateTime) {
+    setMessage("Return date must be greater than the issued date!");
+    setIsError(true);
+    setIsMessage(true)
+    return false;
+  }
+
+   return true;
+}
 
 
   const handleEdit = async(issuance) => {
+    
+    if (issuance.status === "RETURNED") {
+      setToast("Can't update. Book is already returned");
+      setShowToast(true); 
+      console.log("toast opened")
+      return; 
+    }
+
     let newIssuance = {};
 
    
@@ -79,7 +111,6 @@ useEffect(() => {
      
         newIssuance = response.data;
         setSelectedIssuance(response.data);
-        console.log(response.data);
       
     });
   
@@ -96,7 +127,7 @@ useEffect(() => {
     setReturnDate(formattedReturnDate); 
     setStatus(newIssuance.status || ""); 
     setIssuanceType(newIssuance.issuanceType || ""); 
-    
+    setIsMessage(false);
     
     setIsEditModalOpen(true);
     
@@ -105,8 +136,10 @@ useEffect(() => {
   const handleConfirmEdit = (e) => {
     e.preventDefault();
 
-    console.log("User ID:", userId);
-    console.log("Book ID:", bookId);
+    if(!validateForm()){
+      return;
+    }
+
   
     if (selectedIssuance) {
       putRequest(
@@ -120,16 +153,24 @@ useEffect(() => {
         },
         (response) => {
           if (response?.status === 200 || response?.status === 201) {
-            console.log("Issuance updated:", response.data);
-            setIsEditModalOpen(false);
+         
+            setMessage("Issuance updated successfully!");
+        setIsError(false);
+        setIsMessage(true)
+            setTimeout(() => {
+              setIsEditModalOpen(false);
+
+            },2000)
+            
             fetchData(); 
           } else {
-            console.error("Error updating issuance", response?.data);
+           
+            setMessage("Error updating issuance");
+            setIsError(true);
+            setIsMessage(true);
           }
         }
       );
-    } else {
-      console.error("User ID or Book ID is missing");
     }
   };
   
@@ -144,6 +185,7 @@ useEffect(() => {
   const handleDelete = (issuance) => {
     setSelectedIssuance(issuance);
     setIsDeleteModalOpen(true);
+    setMessage("");
   };
 
  
@@ -153,12 +195,20 @@ const handleConfirmDelete = () => {
       `${DELETE_ISSUANCE}${selectedIssuance.id}`, 
       (response) => {
         if (response?.status === 200 || response?.status === 201) {
-          console.log("Issuance deleted:", response.data);
-          setIsDeleteModalOpen(false);
-          setSelectedIssuance(null);
+         
+          setMessage("Book deleted successfully!");
+          setIsError(false);
+          setIsMessage(true)
+          setTimeout(() => {
+            setIsDeleteModalOpen(false);
+            setSelectedIssuance(null);
+          },2000)
           fetchData(); 
         } else {
-          console.error("Error deleting issuance", response?.data);
+          setMessage("Failed to delete issuance");
+          setIsError(true);
+          setIsMessage(true);
+          
         }
       }
     );
@@ -188,7 +238,7 @@ const handleConfirmDelete = () => {
     { 
       header: "Action",
       Cell: ({ row }) => (
-        <div>
+        <div className="table-component-actions">
           <Button
             className="table-btn"
             imageSrc={editIcon}
@@ -206,8 +256,13 @@ const handleConfirmDelete = () => {
     },
   ];
 
+  const modalDimension = isMessage ? {height: "600", width:"400px"} : {height: "550", width:"400px"};
+  const deleteModalDimension = isMessage ? {height: "280", width:"300px"} : {height: "320", width:"300px"};
+
   return (
     <div className="table-container">
+       {data.length > 0 ? (
+        <>
       <TableComponent columns={columns} data={dataWithSerialNumbers} />
       {showPagination && (
         <div className="pagination-controls">
@@ -225,13 +280,24 @@ const handleConfirmDelete = () => {
           </button>
         </div>
       )}
+       </>
+      ) : (
+        <p className="no-data-message">No data available</p>
+      )}
+
       <Modal
   isOpen={isEditModalOpen}
   onClose={() => setIsEditModalOpen(false)}
   title="Edit Issuance"
-  height="450px"
-  width="450px"
+    height={modalDimension.height}
+        width={modalDimension.width}
+
 >
+{message && (
+          <p className={isError ? "error-message" : "success-message"}>
+            {message}
+          </p>
+        )}
   <label htmlFor="name">Username</label>
   <input type="text" value={selectedIssuance?.users?.name || ""} readOnly />
 
@@ -275,9 +341,14 @@ const handleConfirmDelete = () => {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         title="Delete Issuance"
-        height="250px"
-        width="350px"
+        height={deleteModalDimension.height}
+        width={deleteModalDimension.width}
       >
+        {message && (
+          <p className={isError ? "error-message" : "success-message"}>
+            {message}
+          </p>
+        )}
         <p style={{ color: "black" }}>
           Are you sure you want to delete this issuance?
         </p>

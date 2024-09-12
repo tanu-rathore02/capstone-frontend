@@ -86,6 +86,25 @@ export const putRequest = async (api, payload, callback) => {
 };
 
 
+export const patchRequest = async (api, payload, callback) => {
+  await axios
+    .patch(BASE_URL + api, payload, {
+      headers: {
+        Authorization:  getToken(),
+      },
+    })
+    .then((res) => {
+      if (res?.status === 201 || res?.status === 200) {
+        callback(res);
+      }
+    })
+    .catch((error) => {
+      callback(error.response);
+    });
+};
+
+
+
 export const  deleteRequest = async (api, callback) => {
  await axios
     .delete(BASE_URL + api, {

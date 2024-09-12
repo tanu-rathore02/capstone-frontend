@@ -3,13 +3,15 @@ import '../styles/Pages.css';
 import IssuancesTable from "../components/IssuancesTable";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
+import Loader from "../components/Loader";
 import HocWrapper from "../components/HocWrapper";
 import Button from "../components/Button";
 import axios from "axios";
 import Modal from "../components/Modal";
+import Searchbar from "../components/Searchbar";
 
 
-function Issuances() {
+function Issuances({setLoading}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [returnDate, setReturnDate] = useState('');
   const [status, setStatus] = useState('');
@@ -18,9 +20,14 @@ function Issuances() {
   const [books, setBooks] = useState([]);
   const [username, setUsername] = useState( );
   const [bookname, setBookname] = useState( );
-  const [errorMessage, setErrorMessage] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [issueDate, setIssueDate] = useState(''); 
   const [refresh, setRefresh] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); 
+  const [message, setMessage] = useState();
+  const [isError, setIsError] = useState(false);
+  const [isMessage, setIsMessage] = useState(false);
+  
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -33,7 +40,6 @@ function Issuances() {
         });
         setUsers(response.data); 
       } catch (error) {
-        console.error("Error fetching users", error);
       }
     };
     
@@ -47,7 +53,7 @@ function Issuances() {
         });
         setBooks(response.data); 
       } catch (error) {
-        console.error("Error fetching books", error);
+       
       }
     };
 
@@ -57,6 +63,10 @@ function Issuances() {
 
   const handleButtonClick = () => {
     setIsModalOpen(true);
+    setMessage('');
+    const now = new Date();
+    const formattedIssueDate = now.toISOString().slice(0, 16);
+    setIssueDate(formattedIssueDate);
   };
 
   const handleCloseModal = () => {
@@ -66,33 +76,53 @@ function Issuances() {
     setIssuanceType('');
     setBookname();
     setUsername();
-    setErrorMessage('');
+    setMessage('');
+    setIsMessage(false);
   };
+
+  
+const validateForm = () => {
+   
+
+  const issueDateObj = new Date(issueDate); 
+  const returnDateObj = new Date(returnDate);
+
+  if(!returnDate || !issuanceType || !username || !bookname || !status ){
+    setMessage("Please fill all the fields");
+    setIsError(true);
+    setIsMessage(true);
+    return false;
+  }
+  
+  if (returnDateObj <= issueDateObj) {
+    setMessage("Return date must be greater than the issued date!");
+    setIsError(true);
+    setIsMessage(true)
+    return false;
+  }
+
+   return true;
+}
 
   const handleIssuanceSubmit = async (e) => {
     e.preventDefault();
+   
+    if(!validateForm){
+      return;
+    }
 
-    
-    const formatDateTime = (dateString, time = '15:30:00') => {
-      return dateString + 'T' + time; 
-    };
     const formattedStatus = status.toUpperCase();
+    const formattedReturnDate = returnDate ? new Date(returnDate).toISOString() : "";
     const formattedIssuanceType = issuanceType.replace(/\s+/g, '-').toUpperCase(); 
-    const formattedReturnDate = formatDateTime(returnDate); 
+ 
 
-    console.log({
-      userId: username,
-      bookId: bookname,
-      status: formattedStatus,
-      issuanceType: formattedIssuanceType,
-      returnDate: returnDate,
-    });
 
     try {
       const token = localStorage.getItem("token");
       const issuanceData = {
-        userId: username,
-        bookId: bookname,
+       
+        userId: mobileNumber,
+        bookId: parseInt(bookname),
         status: formattedStatus,
         issuanceType: formattedIssuanceType,
         returnDate: formattedReturnDate,
@@ -106,13 +136,17 @@ function Issuances() {
           },
         }
       );
-
-      console.log("Issuance created:", response.data);
+      setMessage("Issuance created successfully!");
+      setIsError(false);
+      setIsMessage(true);
+    
       handleCloseModal();
       setRefresh((prev) => !prev);
     } catch (error) {
-      console.error("Error creating issuance", error);
-      setErrorMessage("Failed to add issuance. Please try again");
+     
+      setMessage("Failed to add issuance. Please try again");
+      setIsError(true);
+      setIsMessage(true);
     }
   };
 
@@ -122,30 +156,40 @@ function Issuances() {
     setSearchTerm(term); 
   };
 
+  const modalDimension = isMessage ? {height: "650", width:"400px"} : {height: "550", width:"400px"};
+
   return (
     <div className="pages-container">
       <div className="controls-container">
-        {/* <Searchbar onClick={handleSearch}/> */}
+        <Searchbar onClick={handleSearch}/>
         <Button name="Add Issuance" className="page-btn" onClick={handleButtonClick} />
       </div>
-      <IssuancesTable showPagination={true} refresh={refresh} searchTerm= {searchTerm} />
+      <IssuancesTable showPagination={true} refresh={refresh} searchTerm= {searchTerm} setLoading={setLoading} />
       <Modal
         title="Add Issuance"
         isOpen={isModalOpen}
         onClose={handleCloseModal}
+        height={modalDimension.height}
+        width={modalDimension.width}
        
       >
+           {message && (
+          <p className={isError ? "error-message" : "success-message"}>
+            {message}
+          </p>
+        )}
         <form onSubmit={handleIssuanceSubmit}>
-        <label htmlFor="name">Username</label>
+       
+          <label htmlFor="mobileNumber">Mobile Number</label>
           <select
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={mobileNumber}
+            onChange={(e) => setMobileNumber(e.target.value)}
             
           >
             <option value="">Select User</option>
             {users.map((user) => (
               <option key={user.id} value={user.id}>
-                {user.name}
+                {user.mobileNumber}
               </option>
             ))}
           </select>
@@ -164,31 +208,20 @@ function Issuances() {
           </select>
           <label htmlFor="returnDate">Return Date</label>
           <input
-            type="date"
+            type="datetime-local"
             placeholder="Return Date"
             value={returnDate}
+            min={issueDate}
             onChange={(e) => setReturnDate(e.target.value)}
             
           />
-          <div>
-            <label>Status:</label>
-            <input
-              type="radio"
-              value="ISSUED"
-              checked={status === 'ISSUED'}
-              onChange={(e) => setStatus(e.target.value)}
-             
-            />
-            <label>ISSUED</label>
-            <input
-              type="radio"
-              value="RETURNED"
-              checked={status === 'RETURNED'}
-              onChange={(e) => setStatus(e.target.value)}
-             
-            />
-            <label>RETURNED</label>
-          </div>
+        
+          <label htmlFor="status">Status:</label>
+          <select value={status} onChange={(e) => setStatus(e.target.value)}>
+            <option value="">Select Status</option>
+            <option value="ISSUED">Issued</option>
+          </select>
+
           <div>
             <label>Issuance Type:</label>
             <input
@@ -223,6 +256,6 @@ function Issuances() {
   );
 }
 
-export default HocWrapper(Navbar, Header)(Issuances);
+export default HocWrapper(Navbar, Header, Loader)(Issuances);
 
 

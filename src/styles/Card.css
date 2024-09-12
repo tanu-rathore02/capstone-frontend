@@ -1,42 +1,42 @@
-   .card-container {
-    align-items: center;
-    padding: 5%;
-    width: 90%;
-    height: 25vh;
-    border-radius: 3%;
-    background-color: #E2D6DF;
-    box-shadow: 0 0.5% 1% rgba(0, 0, 0, 0.2);
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.card-container {
+  align-items: center;
+  padding: 5%;
+  width: 90%;
+  height: auto;
+  border-radius: 3%;
+  background-color: #e2d6df;
+  box-shadow: 0 0.5% 1% rgba(0, 0, 0, 0.2);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card-container:hover {
-    transform: translateY(-1%);
-    box-shadow: 0 1% 2% rgba(0, 0, 0, 0.2);
-    background-color: #D1C4D6;
+  transform: translateY(-1%);
+  box-shadow: 0 1% 2% rgba(0, 0, 0, 0.2);
+  background-color: #d1c4d6;
 }
 
 .card-container img {
-    width: 5.2vw;
-    height: 5vw;
-    padding-bottom: 2%;
+  width: 5.2vw;
+  height: 5vw;
+  padding-bottom: 2%;
 }
 
 .card-h {
-    padding: 0%;
-    font-size: 1.3vw;
-    color: #3a3043;
+  padding: 0%;
+  font-size: 1.3vw;
+  color: #3a3043;
 }
 
 .card-p {
   margin-top: 0;
-    font-size: 1.5vw;
-    color: #3a3043;
+  font-size: 1.5vw;
+  color: #3a3043;
 }
 
 @media (max-width: 768px) {
   .card-container {
-    height: 30vh;
+    height: 18vh;
     border-radius: 2%;
     box-shadow: 0 0.4% 0.8% rgba(0, 0, 0, 0.2);
   }
@@ -55,4 +55,3 @@
     font-size: 2.2vw;
   }
 }
-

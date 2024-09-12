@@ -6,10 +6,6 @@ const ProtectedRoutes = ({ allowedRoles }) => {
   const role = localStorage.getItem("role");
 
 
-  console.log('Token:', token);
-  console.log('Role:', role);
-  console.log('Allowed Roles:', allowedRoles);
-
 
   if (!token) {
     

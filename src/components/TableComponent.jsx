@@ -5,7 +5,7 @@ import '../styles/TableComponent.css';
 const TableComponent = ({ columns, data}) => {
  
   return (
-    <div className="table-container">
+    <div className='table-component-wrapper'>
       <table className="table-component">
         <thead>
           <tr>
@@ -26,7 +26,7 @@ const TableComponent = ({ columns, data}) => {
           ))}
         </tbody>
       </table>
-    </div>
+      </div>
   );
 };
 

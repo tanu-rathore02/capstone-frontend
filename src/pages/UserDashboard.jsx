@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import HocWrapper from '../components/HocWrapper';
 import Navbar from '../components/Navbar';
 import Header from '../components/Header';
+import Loader from '../components/Loader'
 import TableComponent from '../components/TableComponent';
 import axios from 'axios';
 import '../styles/UserDashboard.css'
@@ -19,7 +20,7 @@ const UserDashboard = () => {
       const token = localStorage.getItem('token');
       const id = localStorage.getItem('userId');  
       if (!id) {
-        console.error("User ID is missing");
+       
         return;
       }
   
@@ -27,7 +28,7 @@ const UserDashboard = () => {
         headers: { Authorization: token },
       });
   
-      console.log('Issuance Data:', response.data);
+ 
   
       if (response.data && Array.isArray(response.data)) {
         setData(response.data.map((issuance, index) => ({
@@ -39,11 +40,11 @@ const UserDashboard = () => {
           issuanceType: issuance.issuanceType || 'N/A',
         })));
       } else {
-        console.error('Unexpected response format:', response);
+       
         setData([]); 
       }
     } catch (error) {
-      console.error('Error fetching issuance history', error);
+   
       setData([]);
     }
   };
@@ -75,4 +76,4 @@ const UserDashboard = () => {
 };
 
 
-export default HocWrapper(Navbar, Header)(UserDashboard);
+export default HocWrapper(Navbar, Header, Loader)(UserDashboard);

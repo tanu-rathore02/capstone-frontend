@@ -1,15 +1,11 @@
-.table-container {
-  width: 100%;
-  overflow-x: auto; 
-  display: block; 
-}
-
 .table-component {
+  table-layout: fixed;
   width: 100%;
   border-collapse: collapse;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  table-layout: fixed; 
-  min-width: 1000px; 
+  overflow: hidden;
+
+
 }
 
 .table-component thead {
@@ -20,27 +16,29 @@
 .table-component th {
   padding: 1% 0.5%;
   text-align: left;
-  white-space: nowrap; 
+  font-size: 2.5vh;
+
 }
 
 .table-component td {
-  overflow: hidden;
-  text-overflow: ellipsis;
 
+  font-size: 2.2vh;
   padding: 1% 0.5%;
   text-align: left;
 }
 
 .table-component tbody tr {
   background-color: #E2D6DF;
-  backdrop-filter: blur(10px);
+
 }
 
 .table-component tbody tr:nth-child(even) {
   background-color: #fffdfe;
 }
 
-.table-component td div {
+.table-component-actions{
+
+
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -81,13 +79,16 @@
 }
 
 @media (max-width: 768px) {
-  .table-component th, .table-component td {
-    padding: 1% 1%;
+
+  .table-component-wrapper {
+    overflow-x: auto;
+    width: 100%;
   }
 
-  .table-component td div {
-    gap: 0.5%;
-  }
+ .table-component{
+  width: 100%;
+  min-width: 1500px;
+ }
 
   .pagination-controls {
     margin-top: 1%;

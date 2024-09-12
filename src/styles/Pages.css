@@ -1,3 +1,7 @@
+.table-container {
+  width: 100%;
+}
+
 .pages-container {
   padding: 2%; 
   display: flex;
@@ -23,20 +27,43 @@ input[type="text"] {
 }
 
 
+.no-data-message {
+  color: red;
+  background-color: #ffe6e6;
+  padding: 10px;
+  margin-top: 15px;
+  border-radius: 4px;
+}
+
 @media (max-width: 768px) {
+  .table-container {
+width: 100%;
+  }
+
   .pages-container {
-    padding: 5% 5% 2% 25%;
-    gap: 4%;
+    padding: 4%; 
   }
-
+  
   .controls-container {
-   
-    padding-bottom: 4%;
+    padding-bottom: 5%;
   }
-
+  
   input[type="text"] {
-    padding: 3%;
-    border-radius: 2%;
-    margin-bottom: 3%;
+    width: 100%;
+    padding: 2%; 
+    border: none; 
+    border-radius: 1%; 
+    box-sizing: border-box;
+    margin-bottom: 2%; 
   }
+  
+  
+  .no-data-message {
+    color: red;
+    background-color: #ffe6e6;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 4px;
+  }
+  
 }
