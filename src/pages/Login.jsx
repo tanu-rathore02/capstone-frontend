@@ -85,7 +85,7 @@ function Login() {
         localStorage.setItem("role", userType);
         localStorage.setItem("userId", id);
         localStorage.setItem("name", name);
-        console.log(response.data);
+     
         
  
 
