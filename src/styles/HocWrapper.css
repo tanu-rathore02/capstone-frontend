@@ -1,0 +1,25 @@
+.hoc-container {
+    display: grid;
+    grid-template-columns: 15% 85%;
+}
+
+.nav-container {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+}
+
+.header-container {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.component-container {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+@media (max-width: 768px) {
+  .hoc-container {
+    grid-template-columns: 25% 75%;
+}
+}

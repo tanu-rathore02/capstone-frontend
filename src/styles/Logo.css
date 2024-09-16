@@ -1,0 +1,16 @@
+.logo-container {
+   
+    align-items: left;
+    padding-top: 10px;
+    margin-top: 10px;
+    left: 10%;
+    margin-left: 2%;
+}
+
+  
+  .logo-container img {
+    width: 75px;
+    height: auto;
+    margin-right: 10px;
+  }
+  

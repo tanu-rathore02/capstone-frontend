@@ -1,0 +1,62 @@
+
+body {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.dashboard-container {
+  
+  padding: 2% 3%;
+ 
+}
+.cards-container {
+  grid-template-columns: 23.3% 23.3% 23.3% 23.5%;
+  display: grid;
+  grid-gap: 2%;
+
+}
+
+.dashboard-container .table-container {
+  width: auto;
+}
+ 
+.heading{
+  margin-top: 2%;
+  text-align: left;
+  margin-bottom: 1%;
+  font-size: x-large;
+  font-weight: bold;
+  color: #3a3043;
+
+ }
+ @media (max-width: 768px) {
+
+  .dashboard-container {
+    padding: 4%;
+    
+    
+  }
+
+  .cards-container {
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 4%;
+  }
+
+  .dashboard-container .table-container {
+    overflow-x: auto;
+    width: 100%;
+   
+  }
+
+
+  .heading , .link{
+    padding-top: 2%;
+ 
+  }
+
+  .admin-table{
+    overflow: auto;
+    max-width: 1000px;
+
+  }
+}
