@@ -89,7 +89,6 @@ function IssuancesTable({
   const validateForm = () => {
     const currentDateTime = new Date();
     const selectedReturnDate = new Date(returnDate);
-
     if (selectedReturnDate <= currentDateTime) {
       setMessage("Return date must be greater than the issued date!");
       setIsError(true);
@@ -122,7 +121,7 @@ function IssuancesTable({
     setStatus(newIssuance.status || "");
     setIssuanceType(newIssuance.issuanceType || "");
     setIsMessage(false);
-
+    setMessage("");
     setIsEditModalOpen(true);
   };
 
@@ -145,7 +144,8 @@ function IssuancesTable({
         },
         (response) => {
           if (response?.status === 200 || response?.status === 201) {
-            setMessage("Issuance updated successfully!");
+          
+            setMessage(response?.data.statusMsg);
             setIsError(false);
             setIsMessage(true);
             setTimeout(() => {
@@ -154,7 +154,7 @@ function IssuancesTable({
 
             fetchData();
           } else {
-            setMessage("Error updating issuance");
+            setMessage(response?.data.statusMsg);
             setIsError(true);
             setIsMessage(true);
           }
@@ -174,13 +174,14 @@ function IssuancesTable({
     setSelectedIssuance(issuance);
     setIsDeleteModalOpen(true);
     setMessage("");
+    setIsMessage(false);
   };
 
   const handleConfirmDelete = () => {
     if (selectedIssuance?.id) {
       deleteRequest(`${DELETE_ISSUANCE}${selectedIssuance.id}`, (response) => {
         if (response?.status === 200 || response?.status === 201) {
-          setMessage("Book deleted successfully!");
+          setMessage(response?.data.statusMsg);
           setIsError(false);
           setIsMessage(true);
           setTimeout(() => {
@@ -189,7 +190,7 @@ function IssuancesTable({
           }, 2000);
           fetchData();
         } else {
-          setMessage("Failed to delete issuance");
+          setMessage(response?.data.statusMsg);
           setIsError(true);
           setIsMessage(true);
         }

@@ -134,7 +134,8 @@ function Books({ setLoading }) {
 
     postRequest(CREATE_BOOK, bookData, (response) => {
       if (response?.status === 200 || response?.status === 201) {
-        setMessage("Book added successfully!");
+     
+        setMessage(response?.data.statusMsg);
         setIsMessage(true);
         setIsError(false);
 
@@ -144,11 +145,11 @@ function Books({ setLoading }) {
 
         setRefresh((prev) => !prev);
       } else if (response?.status === 409) {
-        setMessage("Book with this name already exists!");
+        setMessage(response?.data.statusMsg);
         setIsMessage(true);
         setIsError(true);
       } else {
-        setMessage("Failed to add book. Please try again");
+        setMessage(response?.data.statusMsg);
         setIsMessage(true);
         setIsError(true);
       }

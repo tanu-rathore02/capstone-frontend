@@ -43,7 +43,7 @@ const fetchIssuanceHistory = async () => {
 
 useEffect(() => {
   fetchIssuanceHistory();
-  console.log('bookId', bookId);
+
 }, [bookId]);
 
   const columns = [

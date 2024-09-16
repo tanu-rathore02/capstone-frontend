@@ -88,7 +88,7 @@ function Users({setLoading}) {
       setIsMessage(true);
       setIsError(true);
       return false;
-    }else if (mobileNumber.length <10){
+    }else if (mobileNumber.length >10){
       setMessage("Phone number must be 10 digits long");
       setIsMessage(true);
       setIsError(true);
@@ -116,7 +116,7 @@ function Users({setLoading}) {
 
     postRequest(CREATE_USER, userData, (response) => {
         if (response?.status === 200 || response?.status === 201){
-          setMessage("User Added Successfully!");
+          setMessage(response?.data.statusMsg);
           setIsError(false);
           setIsMessage(true);
          
@@ -126,12 +126,12 @@ function Users({setLoading}) {
 
         setRefresh((prev) => !prev);
         }else if (response?.status === 409) {
-          setMessage("User with this credentials already exists!");
+          setMessage(response?.data.statusMsg);
           setIsError(true);
           setIsMessage(true);
         } else {
          
-          setMessage("Failed to add user. Please try again");
+          setMessage(response?.data.statusMsg);
           setIsError(true);
           setIsMessage(true);
         }

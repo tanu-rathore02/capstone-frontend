@@ -66,7 +66,7 @@ function CategoryTable({
   const handleConfirmDelete = () => {
     deleteRequest(`${DELETE_CATEGORY}${selectedCategory.id}`, (response) => {
       if (response?.status === 200  || response?.status === 201) {
-        setMessage("Category deleted successfully!");
+        setMessage(response?.data.statusMsg);
         setIsMessage(true);
         setIsError(false);
         setTimeout(() => {
@@ -77,14 +77,14 @@ function CategoryTable({
       } else if (response.status === 405) {
         setTimeout(() => {
           setMessage(
-            "Error deleting category! Book from this category is issued"
+            response?.data.statusMsg
           );
           setIsMessage(true);
           setIsError(true);
         }, 2000);
       } else {
         setTimeout(() => {
-          setMessage("Failed to delete this category");
+          setMessage(response?.data.statusMsg);
           setIsError(true);
           setIsMessage(true);
         }, 2000);
@@ -124,7 +124,7 @@ function CategoryTable({
       { categoryName: trimmedCategory },
       (response) => {
         if (response?.status === 200 || response?.status === 201) {
-          setMessage("Category updated successfully!");
+          setMessage(response?.data.statusMsg);
           setIsError(false);
           setIsMessage(true);
           setTimeout(() => {
@@ -134,11 +134,11 @@ function CategoryTable({
           }, 2000);
           fetchData();
         } else if (response?.status === 409) {
-          setMessage("Category with this name already exists!");
+          setMessage(response?.data.statusMsg);
           setIsMessage(true);
           setIsError(true);
         } else {
-          setMessage("Error updating category!");
+          setMessage(response?.data.statusMsg);
           setIsError(true);
           setIsMessage(true);
         }

@@ -21,6 +21,9 @@ function Categories({setLoading}) {
 
   const handleButtonClick = () => {
     setIsModalOpen(true);
+    setIsMessage(false);
+    setIsError(false);
+    setMessage("");
   };
 
   const handleCloseModal = () => {
@@ -57,7 +60,7 @@ function Categories({setLoading}) {
 
     postRequest(CREATE_CATEGORY, categoryData, (response) => {
       if (response?.status === 200 || response?.status === 201) {
-        setMessage("Category added successfully!");
+        setMessage(response?.data.statusMsg);
         setIsMessage(true);
         setIsError(false);
         setRefresh((prev) => !prev);
@@ -66,14 +69,12 @@ function Categories({setLoading}) {
           setCategoryName("");
         }, 2000);
       } else if (response?.status === 409) {
-        setMessage("Category with this name already exists!");
+        setMessage(response?.data.statusMsg);
         setIsMessage(true);
-
         setIsError(true);
       } else {
-        setMessage("Failed to add category. Please try again");
+        setMessage(response?.data.statusMsg);
         setIsMessage(true);
-
         setIsError(true);
       
       }

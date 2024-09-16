@@ -204,10 +204,7 @@ function BooksTable({
 
   //Assignment Functions
   const handleAssign = (book) => {
- 
-
     setId(book.id);
-    console.log(id);
     setTitle(book.title);
     setIsAssignModalOpen(true);
     setMessage("");
@@ -216,6 +213,7 @@ function BooksTable({
     const formattedIssueDate = now.toISOString().slice(0, 16);
     setIssueDate(formattedIssueDate);
   };
+  
   const handleAssignmentSubmit = async (e) => {
     e.preventDefault();
 
@@ -241,7 +239,8 @@ function BooksTable({
 
     postRequest(CREATE_ISSUANCE, issuanceData, (response) => {
       if (response?.status === 200 || response?.status === 201) {
-        setMessage(`Issuance added successfully!`);
+  
+        setMessage(response?.data.statusMsg);
         setIsError(false);
         setIsMessage(true);
         setStatus("");
@@ -254,11 +253,11 @@ function BooksTable({
           navigate("/issuances");
         }, 2000);
       } else if (response?.status === 400 || response?.status === 409) {
-        setMessage("Failed to add issuance. Please try again");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
       } else {
-        setMessage("An unexpected error occurred. Please try again");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
       }
@@ -293,7 +292,7 @@ function BooksTable({
 
     putRequest(`${UPDATE_BOOK}${selectedBook.id}`, updateData, (response) => {
       if (response?.status === 200 || response?.status === 201) {
-        setMessage("Book updated successfully!");
+        setMessage(response?.data.statusMsg);
         setIsError(false);
         setIsMessage(true);
         setTimeout(() => {
@@ -306,11 +305,11 @@ function BooksTable({
         }, 2000);
         fetchData();
       } else if (response?.status === 409) {
-        setMessage("A book with this title already exists!");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
       } else {
-        setMessage("Error updating book!");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
       }
@@ -323,13 +322,12 @@ function BooksTable({
     setIsDeleteModalOpen(true);
     setMessage("");
     setIsMessage(false);
-    console.log("click delete button");
   };
 
   const handleConfirmDelete = async () => {
     deleteRequest(`${DELETE_BOOK}${selectedBook.id}`, (response) => {
       if (response?.status === 200 || response?.status === 201) {
-        setMessage("Book deleted successfully!");
+        setMessage(response?.data.statusMsg);
         setIsError(false);
         setIsMessage(true);
 
@@ -339,7 +337,7 @@ function BooksTable({
         }, 2000);
         fetchData();
       } else if (response?.status === 405) {
-        setMessage("Error deleting Book! This book is issued to someone");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
       }

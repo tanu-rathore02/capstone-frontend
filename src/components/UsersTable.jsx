@@ -203,10 +203,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
       .toUpperCase();
 
       const formattedReturnDate = returnDate ? new Date(returnDate).toISOString() : "";
-
-   
-
-    const issuanceData = {
+      const issuanceData = {
       userId: userId,
       bookId: parseInt(bookname),
       status: 'ISSUED',
@@ -219,7 +216,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
     postRequest(CREATE_ISSUANCE, issuanceData, (response) => {
       if (response?.status === 200 || response?.status === 201) {
      
-        setMessage("Issuance added successfully!");
+        setMessage(response?.data.statusMsg);
         setIsError(false);
         setIsMessage(true);
         setStatus("");
@@ -234,12 +231,12 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
         }, 2000);
       } else if (response?.status === 400 || response?.status === 409) {
        
-        setMessage("Failed to add issuance. Please try again");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
       } else {
   
-        setMessage("An unexpected error occurred. Please try again");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
       }
@@ -279,7 +276,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
       (response) => {
         if (response?.status === 200  || response?.status === 201) {
          
-          setMessage("User updated successfully!");
+          setMessage(response?.data.statusMsg);
           setIsMessage(true);
           setIsError(false);
           setTimeout(() => {
@@ -291,11 +288,11 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
           }, 2000);
           fetchData();
         } else if (response?.status === 409) {
-          setMessage("A user with these credentials already exists!");
+          setMessage(response?.data.statusMsg);
           setIsError(true);
           setIsMessage(true);
         } else {
-          setMessage("Error updating user details!");
+          setMessage(response?.data.statusMsg);
           setIsError(true);
           setIsMessage(true);
          
@@ -309,20 +306,20 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
     setSelectedUser(user);
     setIsDeleteModalOpen(true);
     setMessage("");
-    setIsMessage(true);
+    setIsMessage(false);
   };
   const handleConfirmDelete = () => {
  
     deleteRequest(`${DELETE_USER}/${selectedUser.mobileNumber}`, (response) => {
       if (response?.status === 200 || response?.status === 201) {
-        setMessage("User deleted successfully!");
+        setMessage(response?.data.statusMsg);
         setIsError(false);
         setIsMessage(true);
         setIsDeleteModalOpen(false);
         setSelectedUser(null);
         fetchData();
       } else if ( response?.status === 405){
-        setMessage("Error deleting user. Book is issued to this user");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
        
