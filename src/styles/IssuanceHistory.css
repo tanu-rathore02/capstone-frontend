@@ -1,0 +1,8 @@
+.issuance-history-container {
+    padding: 2%; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5%; 
+  }
+  

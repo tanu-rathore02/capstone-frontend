@@ -18,7 +18,7 @@
   padding: 20px; 
   position: relative;
   max-width: 80%;
-  max-height: 90%; 
+  /* max-height: 90%;  */
 
   width: 80%;
   box-sizing: border-box;
@@ -77,13 +77,18 @@
 
 .modal-content form input,
 .modal-content form select {
-  padding: 15px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  color: #333;
+  padding: 15px !important;
+  border-radius: 4px !important;
+  border: 1px solid #ccc !important;
+  font-size: 14px !important;
+  color: #333 !important;
 }
 
+
+
+.modal-content form input[readonly] {
+  cursor: not-allowed !important;      
+}
 
 
 .modal-button-group {
@@ -97,6 +102,10 @@
   padding: 8px 16px;
   font-size: 14px;
   cursor: pointer;
+}
+
+.modal-button-group button:disabled{
+  color: #c4b7d0;
 }
 
 @media (max-width: 500px) {

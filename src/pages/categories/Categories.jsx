@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/Navbar"
 import Header from "../../components/Header";
 import HocWrapper from "../../components/HocWrapper";
 import Button from "../../components/Button";
 import Searchbar from "../../components/Searchbar";
-import CategoryTable from "./CategoryTable";
+import CategoryTable from "./CategoryTable"
 import Modal from "../../components/Modal";
 import { postRequest } from "../../api/ApiManager";
 import { CREATE_CATEGORY } from "../../api/ApiConstants";
@@ -52,7 +52,7 @@ function Categories({setLoading}) {
     
 
     const categoryData = {
-      categoryName: categoryName,
+      categoryName: categoryName.trim(),
     };
 
     postRequest(CREATE_CATEGORY, categoryData, (response) => {
@@ -123,15 +123,16 @@ function Categories({setLoading}) {
         <form onSubmit={handleCategorySubmit}>
           <label htmlFor="categoryName">Category Name</label>
           <input
+           id="categoryName"
             type="text"
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
           />
           <div className="modal-button-group">
-            <Button name="Add" className="table-btn" />
+            <Button name="Add" className="modal-btn" />
             <Button
               name="Cancel"
-              className="table-btn"
+              className="modal-btn"
               onClick={handleCloseModal}
             />
           </div>

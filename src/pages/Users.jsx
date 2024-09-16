@@ -86,10 +86,12 @@ function Users({setLoading}) {
     if (!/^\d+$/.test(mobileNumber)) {
       setMessage("Phone number must contain only digits.");
       setIsMessage(true);
+      setIsError(true);
       return false;
     }else if (mobileNumber.length <10){
       setMessage("Phone number must be 10 digits long");
       setIsMessage(true);
+      setIsError(true);
       return false;
     }
     return true;
@@ -113,7 +115,7 @@ function Users({setLoading}) {
     };
 
     postRequest(CREATE_USER, userData, (response) => {
-        if (response?.status === 200 || 201){
+        if (response?.status === 200 || response?.status === 201){
           setMessage("User Added Successfully!");
           setIsError(false);
           setIsMessage(true);
@@ -191,8 +193,8 @@ function Users({setLoading}) {
      
           />
           <div className='modal-button-group'>
-            <Button type="submit" name="Add" className="table-btn" />
-          <Button type="submit" name="Cancel" className="table-btn"  onClick={handleCloseModal}/>
+            <Button type="submit" name="Add" className="modal-btn" />
+          <Button type="submit" name="Cancel" className="modal-btn"  onClick={handleCloseModal}/>
           </div>
           
         </form>

@@ -1,9 +1,7 @@
-
-
 import React, { useState } from "react";
 import Button from "../components/Button";
 import "../styles/Login.css";
-import Toast from "../components/Toast";
+
 import { useNavigate } from "react-router-dom";
 import { postRequestWithoutAuth } from "../api/ApiManager";
 import { LOGIN_API } from "../api/ApiConstants";
@@ -15,14 +13,13 @@ function Login() {
   const [userType, setUserType] = useState("ADMIN");
   const [errors, setErrors] = useState({});
   const [activeButton, setActiveButton] = useState("ADMIN");
-  const [toastMessage, setToastMessage] = useState("");
-  const [showToast, setShowToast] = useState(false);
   const navigate = useNavigate();
 
   const handleButtonClick = (type) => {
     const upperType = type.toUpperCase();
     setUserType(upperType);
     setActiveButton(upperType);
+    setErrors({});
   };
 
   const validateForm = () => {
@@ -72,10 +69,12 @@ function Login() {
 
     if (!validateForm()) return;
 
+    const encodedPassword = btoa(password);
+
     const credentials =
       userType === "ADMIN"
-        ? { username: email, password }
-        : { username: phoneNo, password };
+        ? { username: email, "password": encodedPassword }
+        : { username: phoneNo, "password": encodedPassword };
 
     postRequestWithoutAuth(LOGIN_API, credentials, (response) => {
       if (response?.status === 200 || response?.status === 201) {
@@ -86,10 +85,9 @@ function Login() {
         localStorage.setItem("role", userType);
         localStorage.setItem("userId", id);
         localStorage.setItem("name", name);
-
+        console.log(response.data);
         
-        setToastMessage("Login successful");
-        setShowToast(true);
+ 
 
         navigate(userType === "ADMIN" ? "/adminDashboard" : "/userDashboard");
       } else if (response?.status === 400) {
@@ -194,11 +192,7 @@ function Login() {
         <div className="signin-image"></div>
       </div>
 
-      <Toast
-        message={toastMessage}
-        show={showToast}
-        onClose={() => setShowToast(false)}
-      />
+ 
     </div>
   );
 }

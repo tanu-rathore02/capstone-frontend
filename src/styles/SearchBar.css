@@ -28,18 +28,18 @@
 
 .search-icon {
   position: absolute;
-  right: 0%;
+  left: 77%;
   width: 35%;
   height: 35%;
-  filter: invert(34%) sepia(54%) saturate(3538%) hue-rotate(256deg) brightness(90%) contrast(101%);
+  bottom: 2vh;
 }
 
 .search-error-message {
   color: red;
   font-size: 12px;
-  margin-top: 5px;
-  margin-left: 10px;
   display: block;
+  position: absolute;
+  top: 24%;
 }
 
 
@@ -55,9 +55,10 @@
   }
 
   .search-icon {
-    right: 4%;
-    width: 12%;
-    height: 12%;
+    left: 84%;
+    width: 14%;
+    top: 1.2vh;
+  
   }
 
   .error-message {
