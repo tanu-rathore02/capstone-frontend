@@ -10,9 +10,7 @@ axios.interceptors.response.use(
     if (error.response && error.response.status === 401) {
    
       window.location.href = "/";
-    } else {
-      console.error("Response error:", error);
-    }
+    } 
     return Promise.reject(error);
   }
 );

@@ -27,10 +27,7 @@ export const GET_ISSUANCE_BY_BOOK = "issuances/book/"
 export const GET_ISSUANCE_BY_USER = "issuances/user/"
 export const GET_ISSUANCE_BY_ID = "issuances/issuance/"
 
-export const GET_USER_COUNT = "user-count";
-export const GET_BOOK_COUNT = "books/title-count";
-export const GET_CATEGORY_COUNT = "categories/categoryCount";
-export const GET_INHOUSE_READER_COUNT = "issuances/type/count";
+export const GET_DASHBOARD_COUNT = "dashboard/countAll";
 
 
 

@@ -21,8 +21,7 @@ function CategoryTable({
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] =
-    useState(false);
+  const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryName, setCategoryName] = useState("");
   const [message, setMessage] = useState("");
@@ -32,14 +31,14 @@ function CategoryTable({
   const fetchData = () => {
     setLoading(true);
     getRequest(
-      `${GET_CATEGORY}?page=${currentPage}&size=8&sortBy=id&sortDir=desc&search=${
+      `${GET_CATEGORY}?page=${currentPage}&size=6&sortBy=id&sortDir=desc&search=${
         searchTerm || ""
       }`,
       (response) => {
-        if (response?.status === 200) {
+        if (response?.status === 200 || response?.status === 201) {
           setData(
             response.data.content.map((category, index) => ({
-              sno: index + 1 + currentPage * 8,
+              sno: index + 1 + currentPage * 6,
               categoryName: category.categoryName,
               id: category.id,
             }))
@@ -48,7 +47,6 @@ function CategoryTable({
           setLoading(false);
         } else {
           setLoading(false);
-         
         }
       }
     );
@@ -67,8 +65,8 @@ function CategoryTable({
 
   const handleConfirmDelete = () => {
     deleteRequest(`${DELETE_CATEGORY}${selectedCategory.id}`, (response) => {
-      if (response?.status === 200) {
-        setMessage("Category deleted successfully!");
+      if (response?.status === 200  || response?.status === 201) {
+        setMessage(response?.data.statusMsg);
         setIsMessage(true);
         setIsError(false);
         setTimeout(() => {
@@ -77,16 +75,19 @@ function CategoryTable({
         }, 2000);
         fetchData();
       } else if (response.status === 405) {
-        setMessage(
-          "Error deleting category! Book from this category is issued"
-        );
-        setIsMessage(true);
-        setIsError(true);
+        setTimeout(() => {
+          setMessage(
+            response?.data.statusMsg
+          );
+          setIsMessage(true);
+          setIsError(true);
+        }, 2000);
       } else {
-        setMessage("Failed to delete this category");
-        setIsError(true);
-        setIsMessage(true);
-       
+        setTimeout(() => {
+          setMessage(response?.data.statusMsg);
+          setIsError(true);
+          setIsMessage(true);
+        }, 2000);
       }
     });
   };
@@ -122,8 +123,8 @@ function CategoryTable({
       `${UPDATE_CATEGORY}${selectedCategory.id}`,
       { categoryName: trimmedCategory },
       (response) => {
-        if (response?.status === 200) {
-          setMessage("Category updated successfully!");
+        if (response?.status === 200 || response?.status === 201) {
+          setMessage(response?.data.statusMsg);
           setIsError(false);
           setIsMessage(true);
           setTimeout(() => {
@@ -133,14 +134,13 @@ function CategoryTable({
           }, 2000);
           fetchData();
         } else if (response?.status === 409) {
-          setMessage("Category with this name already exists!");
+          setMessage(response?.data.statusMsg);
           setIsMessage(true);
           setIsError(true);
         } else {
-          setMessage("Error updating category!");
+          setMessage(response?.data.statusMsg);
           setIsError(true);
           setIsMessage(true);
-        
         }
       }
     );
@@ -152,18 +152,20 @@ function CategoryTable({
     {
       header: "Action",
       Cell: ({ row }) => (
-        <div  className="table-component-actions">
+        <div className="table-component-actions">
           <Button
             className="table-btn"
             imageSrc={editIcon}
             altText="edit"
             onClick={() => handleEdit(row)}
+             tooltip="edit"
           />
           <Button
             className="table-btn"
             imageSrc={deleteIcon}
             altText="delete"
             onClick={() => handleDelete(row)}
+             tooltip="delete"
           />
         </div>
       ),
@@ -183,7 +185,7 @@ function CategoryTable({
   };
 
   const modalDimension = isMessage
-    ? { height: "310px", width: "300px" }
+    ? { height: "320px", width: "300px" }
     : { height: "280px", width: "300px" };
 
   return (

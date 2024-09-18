@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect'; // for extended matchers like 'toBeInTheDocument'
-import Button from '../components/Button'; // adjust the path according to your folder structure
+import '@testing-library/jest-dom/extend-expect'; 
+import Button from '../components/Button'; 
 
 describe('Button Component', () => {
   

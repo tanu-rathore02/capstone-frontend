@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import Dropdown from "./Dropdown";
 import TableComponent from "./TableComponent";
 import Modal from "./Modal";
 import editIcon from "../assets/editIcon.svg";
@@ -42,6 +42,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
   const [mobileNumber, setMobileNumber] = useState("");
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [bookOptions, setBookOptions] = useState([]);
   const navigate = useNavigate();
   const [message, setMessage] = useState();
   const [isError, setIsError] = useState(false);
@@ -54,14 +55,14 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
 
     setLoading(true);
     getRequest(
-      `${GET_USER}?page=${currentPage}&size=8&sortBy=id&sortDir=desc&search=${
+      `${GET_USER}?page=${currentPage}&size=6&sortBy=id&sortDir=desc&search=${
         searchTerm || ""
       }`,
       (response) => {
         if (response?.status === 200 || 201) {
           setData(
             response.data.content.map((user, index) => ({
-              sno: index + 1 + currentPage * 8,
+              sno: index + 1 + currentPage * 6,
               id: user.id,
               name: user.name,
               mobileNumber: user.mobileNumber,
@@ -87,13 +88,23 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
   useEffect(() => {
     const fetchBooks = () => {
       getRequest(`${GET_ALL_BOOK}`, (response) => {
-        if (response?.status === 200 || 201) {
+        if (response?.status === 200 || response?.status === 201) {
+          const options = response.data.map(book => ({
+            value: book.id.toString(),
+            label: book.title
+          }));
           setBooks(response.data);
+          setBookOptions(options);
         }
       });
     };
     fetchBooks();
   }, [isAssignModalOpen]);
+
+  
+  const handleBookSelect = (selectedOption) => {
+    setBookname(selectedOption.value);
+  };
 
   const validateEditForm = () => {
     const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;
@@ -150,7 +161,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
     const returnDateObj = new Date(returnDate);
 
     
-    if (!returnDate || !status || !issuanceType) {
+    if (!returnDate  || !issuanceType) {
       setMessage("Please fill all the fields!");
       setIsError(true);
       setIsMessage(true);
@@ -186,19 +197,16 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
       return;
     }
 
-    const formattedStatus = status.toUpperCase();
+   
     const formattedIssuanceType = issuanceType
       .replace(/\s+/g, "-")
       .toUpperCase();
 
       const formattedReturnDate = returnDate ? new Date(returnDate).toISOString() : "";
-
-   
-
-    const issuanceData = {
+      const issuanceData = {
       userId: userId,
       bookId: parseInt(bookname),
-      status: formattedStatus,
+      status: 'ISSUED',
       issuanceType: formattedIssuanceType,
       returnDate: formattedReturnDate,
     };
@@ -208,7 +216,7 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
     postRequest(CREATE_ISSUANCE, issuanceData, (response) => {
       if (response?.status === 200 || response?.status === 201) {
      
-        setMessage("Issuance added successfully!");
+        setMessage(response?.data.statusMsg);
         setIsError(false);
         setIsMessage(true);
         setStatus("");
@@ -223,12 +231,12 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
         }, 2000);
       } else if (response?.status === 400 || response?.status === 409) {
        
-        setMessage("Failed to add issuance. Please try again");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
       } else {
   
-        setMessage("An unexpected error occurred. Please try again");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
       }
@@ -266,9 +274,9 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
       `${UPDATE_USER}/${selectedUser.mobileNumber}`,
       updateData,
       (response) => {
-        if (response?.status === 200) {
+        if (response?.status === 200  || response?.status === 201) {
          
-          setMessage("Book updated successfully!");
+          setMessage(response?.data.statusMsg);
           setIsMessage(true);
           setIsError(false);
           setTimeout(() => {
@@ -280,11 +288,11 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
           }, 2000);
           fetchData();
         } else if (response?.status === 409) {
-          setMessage("A user with these credentials already exists!");
+          setMessage(response?.data.statusMsg);
           setIsError(true);
           setIsMessage(true);
         } else {
-          setMessage("Error updating user details!");
+          setMessage(response?.data.statusMsg);
           setIsError(true);
           setIsMessage(true);
          
@@ -298,20 +306,20 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
     setSelectedUser(user);
     setIsDeleteModalOpen(true);
     setMessage("");
-    setIsMessage(true);
+    setIsMessage(false);
   };
   const handleConfirmDelete = () => {
  
     deleteRequest(`${DELETE_USER}/${selectedUser.mobileNumber}`, (response) => {
-      if (response?.status === 200) {
-        setMessage("User deleted successfully!");
+      if (response?.status === 200 || response?.status === 201) {
+        setMessage(response?.data.statusMsg);
         setIsError(false);
         setIsMessage(true);
         setIsDeleteModalOpen(false);
         setSelectedUser(null);
         fetchData();
       } else if ( response?.status === 405){
-        setMessage("Error deleting user. Book is issued to this");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
        
@@ -349,21 +357,25 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
             className="table-btn"
             imageSrc={editIcon}
             onClick={() => handleEdit(row)}
+            tooltip="edit"
           />
           <Button
             className="table-btn"
             imageSrc={deleteIcon}
             onClick={() => handleDelete(row)}
+            tooltip="delete"
           />
           <Button
             className="table-btn"
             imageSrc={historyIcon}
             onClick={() => handleHistory(row)}
+            tooltip="view history"
           />
           <Button
             className="table-btn"
             imageSrc={assignIcon}
             onClick={() => handleAssign(row)}
+             tooltip="assign book"
           />
         </div>
       ),
@@ -493,23 +505,12 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
           <input type="text" value={username} readOnly />
 
           <label htmlFor="bookname">Book:</label>
-          <select
-            value={bookname}
-            onChange={(e) => setBookname(e.target.value)}
-          >
-            <option value="">Select Book</option>
-            {books.map((book) => (
-              <option key={book.id} value={book.id}>
-                {book.title}
-              </option>
-            ))}
-          </select>
+          <Dropdown
+            options={bookOptions}
+            onSelect={handleBookSelect}
+            placeholder="Select Book"
+          />
 
-          <label htmlFor="status">Status:</label>
-          <select value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="">Select Status</option>
-            <option value="ISSUED">Issued</option>
-          </select>
 
           <label htmlFor="issuanceType">Issuance Type:</label>
           <select
@@ -520,14 +521,27 @@ function UsersTable({ showPagination = true, refresh, searchTerm, setLoading }) 
             <option value="IN-HOUSE">IN-HOUSE</option>
             <option value="TAKE-AWAY">TAKE-AWAY</option>
           </select>
-          <label htmlFor="returndate">Returned At</label>
-          <input
-            label="Return Date"
-           type="datetime-local"
-           min={issueDate}
-            value={returnDate}
-            onChange={(e) => setReturnDate(e.target.value)}
-          />
+          {issuanceType === "IN-HOUSE" ? (
+            <input
+              label="Return Time"
+              type="time"
+              value={returnDate ? returnDate.split("T")[1] : ""} 
+              onChange={(e) => {
+                const datePart =
+                  returnDate.split("T")[0] ||
+                  new Date().toISOString().split("T")[0];
+                setReturnDate(`${datePart}T${e.target.value}`);
+              }}
+            />
+          ) : (
+            <input
+              label="Return Date & Time"
+              type="datetime-local"
+              value={returnDate || ""} 
+              onChange={(e) => setReturnDate(e.target.value)}
+              min={issueDate}
+            />
+          )}
           {errorMessage && <p>{errorMessage}</p>}
           <div className="modal-button-group">
             <Button className="modal-btn" type="submit" name="Assign" />

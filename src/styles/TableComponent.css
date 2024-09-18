@@ -37,8 +37,6 @@
 }
 
 .table-component-actions{
-
-
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -89,6 +87,18 @@
   width: 100%;
   min-width: 1500px;
  }
+
+ .table-component th {
+ 
+  font-size: 1.8vh;
+
+}
+
+.table-component td {
+
+  font-size: 1.8vh;
+
+}
 
   .pagination-controls {
     margin-top: 1%;

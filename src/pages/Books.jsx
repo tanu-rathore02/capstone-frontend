@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
@@ -6,12 +5,13 @@ import HocWrapper from "../components/HocWrapper";
 import Button from "../components/Button";
 import Searchbar from "../components/Searchbar";
 import BooksTable from "../components/BooksTable";
+import DropDown from "../components/Dropdown";
 import "../styles/Pages.css";
 import Modal from "../components/Modal";
 import { postRequest, getRequest } from "../api/ApiManager";
 import { GET_ALL_CATEGORY, CREATE_BOOK } from "../api/ApiConstants";
 
-function Books({setLoading}) {
+function Books({ setLoading }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -24,18 +24,29 @@ function Books({setLoading}) {
   const [refresh, setRefresh] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isMessage, setIsMessage] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
     const fetchCategories = () => {
       getRequest(GET_ALL_CATEGORY, (response) => {
         if (response?.status === 200) {
-          setCategories(response.data);
+          setCategories(
+            response.data.map((cat) => ({
+              value: cat.id,
+              label: cat.categoryName,
+            }))
+          );
         }
       });
     };
 
     fetchCategories();
   }, [isModalOpen]);
+
+  const handleCategorySelect = (selectedOption) => {
+    setSelectedCategory(selectedOption);
+    setCategory(selectedOption.value);
+  };
 
   const handleButtonClick = () => {
     setIsModalOpen(true);
@@ -55,6 +66,7 @@ function Books({setLoading}) {
       availability: "",
       category: "",
     });
+    setIsError(false);
   };
 
   const validateForm = () => {
@@ -62,7 +74,6 @@ function Books({setLoading}) {
 
     const trimmedTitle = title.trim();
     const trimmedAuthor = author.trim();
-
 
     if (!trimmedTitle || !trimmedAuthor || !availability || !category) {
       setMessage("Please fill all the fields!");
@@ -88,7 +99,7 @@ function Books({setLoading}) {
       setIsMessage(true);
       return false;
     }
-  
+
     if (availabilityNumber < 0) {
       setMessage("Availability cannot be a negative number!");
       setIsError(true);
@@ -101,7 +112,7 @@ function Books({setLoading}) {
       setIsMessage(true);
       return false;
     }
-  
+
     return true;
   };
 
@@ -123,21 +134,22 @@ function Books({setLoading}) {
 
     postRequest(CREATE_BOOK, bookData, (response) => {
       if (response?.status === 200 || response?.status === 201) {
-        setMessage("Book added successfully!");
+     
+        setMessage(response?.data.statusMsg);
         setIsMessage(true);
         setIsError(false);
-       
+
         setTimeout(() => {
           handleCloseModal();
         }, 2000);
 
         setRefresh((prev) => !prev);
       } else if (response?.status === 409) {
-        setMessage("Book with this name already exists!");
+        setMessage(response?.data.statusMsg);
         setIsMessage(true);
         setIsError(true);
       } else {
-        setMessage("Failed to add book. Please try again");
+        setMessage(response?.data.statusMsg);
         setIsMessage(true);
         setIsError(true);
       }
@@ -148,13 +160,13 @@ function Books({setLoading}) {
     setSearchTerm(term);
   };
 
-
-  useEffect(()=>{
+  useEffect(() => {
     // alert(setLoading)
-  },[])
+  }, []);
 
-
-  const modalDimension = isMessage ? {height: "650", width:"400px"} : {height: "550", width:"400px"};
+  const modalDimension = isMessage
+    ? { height: "650", width: "400px" }
+    : { height: "550", width: "400px" };
 
   return (
     <div className="pages-container">
@@ -207,18 +219,11 @@ function Books({setLoading}) {
           />
 
           <label htmlFor="category">Category</label>
-          <select
-            id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="">Select Category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.categoryName}
-              </option>
-            ))}
-          </select>
+          <DropDown
+            options={categories}
+            onSelect={handleCategorySelect}
+            placeholder="Select Category"
+          />
 
           <label htmlFor="availability">Availability</label>
           <input
@@ -230,10 +235,10 @@ function Books({setLoading}) {
           />
 
           <div className="modal-button-group">
-            <Button name="Add" className="table-btn" />
+            <Button name="Add" className="modal-btn" />
             <Button
               name="Cancel"
-              className="table-btn"
+              className="modal-btn"
               onClick={handleCloseModal}
             />
           </div>

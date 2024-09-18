@@ -5,7 +5,8 @@ import Navbar from '../components/Navbar';
 import Header from '../components/Header';
 import Loader from '../components/Loader'
 import TableComponent from '../components/TableComponent';
-import axios from 'axios';
+import { getRequest } from '../api/ApiManager';
+import {  GET_ISSUANCE_BY_USER } from '../api/ApiConstants';
 import '../styles/UserDashboard.css'
 
 
@@ -15,43 +16,33 @@ const UserDashboard = () => {
   const id = localStorage.getItem('userId');
 
 
-  const fetchUserHistory = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const id = localStorage.getItem('userId');  
-      if (!id) {
-       
-        return;
-      }
-  
-      const response = await axios.get(`http://localhost:8080/api/issuances/user/${id}`, {
-        headers: { Authorization: token },
-      });
-  
- 
-  
-      if (response.data && Array.isArray(response.data)) {
-        setData(response.data.map((issuance, index) => ({
-          sno: index + 1,
-          title: issuance.books?.title || 'N/A',
-          issueDate: issuance.issueDate ? new Date(issuance.issueDate).toLocaleDateString() : 'N/A',
-          returnDate: issuance.returnDate ? new Date(issuance.returnDate).toLocaleDateString() : 'N/A',
-          status: issuance.status || 'N/A',
-          issuanceType: issuance.issuanceType || 'N/A',
-        })));
+  const fetchIssuanceHistory = async () => {
+    const fetchCallback = (response) => {
+      if (response?.data && Array.isArray(response.data)) {
+        setData(
+          response.data.map((issuance, index) => ({
+            sno: index + 1,
+            title: issuance.books?.title || 'N/A',
+            issueDate: issuance.issueDate
+              ? new Date(issuance.issueDate).toLocaleDateString()
+              : 'N/A',
+            returnDate: issuance.returnDate
+              ? new Date(issuance.returnDate).toLocaleDateString()
+              : 'N/A',
+            status: issuance.status || 'N/A',
+            issuanceType: issuance.issuanceType || 'N/A',
+          }))
+        );
       } else {
-       
-        setData([]); 
+        setData([]);
       }
-    } catch (error) {
-   
-      setData([]);
-    }
+    };
+  
+    await getRequest(GET_ISSUANCE_BY_USER + id, fetchCallback);
   };
   
-
   useEffect(() => {
-    fetchUserHistory();
+    fetchIssuanceHistory();
   }, [id]);
 
   

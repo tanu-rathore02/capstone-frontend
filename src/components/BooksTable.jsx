@@ -7,7 +7,8 @@ import editIcon from "../assets/editIcon.svg";
 import deleteIcon from "../assets/deleteIcon.svg";
 import assignIcon from "../assets/assignIcon.svg";
 import historyIcon from "../assets/historyIcon.svg";
-import Toast from "./Toast";
+
+import Dropdown from "../components/Dropdown"
 import {
   GET_BOOK,
   UPDATE_BOOK,
@@ -52,8 +53,9 @@ function BooksTable({
   const [message, setMessage] = useState();
   const [isError, setIsError] = useState(false);
   const [isMessage, setIsMessage] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [toast, setToast] = useState("");
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [userOptions, setUserOptions] = useState([]);
+
 
   const navigate = useNavigate();
 
@@ -64,7 +66,7 @@ function BooksTable({
         searchTerm || ""
       }`,
       (response) => {
-        if (response?.status === 200 || 201) {
+        if (response?.status === 200 || response.status === 201) {
           setData(
             response.data.content.map((book, index) => ({
               id: book.id,
@@ -88,15 +90,20 @@ function BooksTable({
     fetchData();
   }, [currentPage, searchTerm, refresh]);
 
-  const fetchUsers = () => {
-    getRequest(`${GET_ALL_USER}`, (response) => {
-      if (response?.status === 200 || 201) {
-        setUsers(response.data);
-      }
-    });
-  };
-
   useEffect(() => {
+    const fetchUsers = () => {
+      getRequest(GET_ALL_USER, (response) => {
+        if (response?.status === 200 || response.status === 201) {
+          const options = response.data.map(user => ({
+            value: user.id,
+            label: `${user.mobileNumber} - ${user.name}`
+          }));
+          setUsers(response.data);
+          setUserOptions(options);
+        }
+      });
+    };
+
     fetchUsers();
   }, [isAssignModalOpen]);
 
@@ -104,13 +111,28 @@ function BooksTable({
     const fetchCategories = () => {
       getRequest(GET_ALL_CATEGORY, (response) => {
         if (response?.status === 200) {
+          const options = response.data.map(cat => ({
+            value: cat.id,
+            label: cat.categoryName
+          }));
           setCategories(response.data);
+          setCategoryOptions(options);
         }
       });
     };
 
     fetchCategories();
   }, [isEditModalOpen]);
+
+  
+  const handleCategorySelect = (selectedOption) => {
+    setCategoryId(selectedOption.value);
+  };
+
+  const handleUserSelect = (selectedOption) => {
+    setMobileNumber(selectedOption.value);
+  };
+
 
   // Validation Functions
   const validateEditForm = () => {
@@ -182,15 +204,7 @@ function BooksTable({
 
   //Assignment Functions
   const handleAssign = (book) => {
-    if (book.availability === 0) {
-      setToast("Book is not available at this moment");
-      setShowToast(true);
-      console.log("toast opened");
-      return; // Prevent opening the modal
-    }
-
     setId(book.id);
-    console.log(id);
     setTitle(book.title);
     setIsAssignModalOpen(true);
     setMessage("");
@@ -199,6 +213,7 @@ function BooksTable({
     const formattedIssueDate = now.toISOString().slice(0, 16);
     setIssueDate(formattedIssueDate);
   };
+  
   const handleAssignmentSubmit = async (e) => {
     e.preventDefault();
 
@@ -210,7 +225,6 @@ function BooksTable({
       ? new Date(returnDate).toISOString()
       : "";
 
-    const formattedStatus = status.toUpperCase();
     const formattedIssuanceType = issuanceType
       .replace(/\s+/g, "-")
       .toUpperCase();
@@ -218,14 +232,15 @@ function BooksTable({
     const issuanceData = {
       userId: mobileNumber,
       bookId: id,
-      status: formattedStatus,
+      status: 'ISSUED',
       issuanceType: formattedIssuanceType,
       returnDate: formattedReturnDate,
     };
 
     postRequest(CREATE_ISSUANCE, issuanceData, (response) => {
-      if (response?.status === 200 || 201) {
-        setMessage(`Issuance added successfully!`);
+      if (response?.status === 200 || response?.status === 201) {
+  
+        setMessage(response?.data.statusMsg);
         setIsError(false);
         setIsMessage(true);
         setStatus("");
@@ -238,11 +253,11 @@ function BooksTable({
           navigate("/issuances");
         }, 2000);
       } else if (response?.status === 400 || response?.status === 409) {
-        setMessage("Failed to add issuance. Please try again");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
       } else {
-        setMessage("An unexpected error occurred. Please try again");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
       }
@@ -277,7 +292,7 @@ function BooksTable({
 
     putRequest(`${UPDATE_BOOK}${selectedBook.id}`, updateData, (response) => {
       if (response?.status === 200 || response?.status === 201) {
-        setMessage("Book updated successfully!");
+        setMessage(response?.data.statusMsg);
         setIsError(false);
         setIsMessage(true);
         setTimeout(() => {
@@ -290,14 +305,13 @@ function BooksTable({
         }, 2000);
         fetchData();
       } else if (response?.status === 409) {
-        setMessage("A book with this title already exists!");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
       } else {
-        setMessage("Error updating book!");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
-        console.error("Error updating book", response?.data);
       }
     });
   };
@@ -312,8 +326,8 @@ function BooksTable({
 
   const handleConfirmDelete = async () => {
     deleteRequest(`${DELETE_BOOK}${selectedBook.id}`, (response) => {
-      if (response?.status === 200) {
-        setMessage("Book deleted successfully!");
+      if (response?.status === 200 || response?.status === 201) {
+        setMessage(response?.data.statusMsg);
         setIsError(false);
         setIsMessage(true);
 
@@ -323,7 +337,7 @@ function BooksTable({
         }, 2000);
         fetchData();
       } else if (response?.status === 405) {
-        setMessage("Error deleting Book! Book from this category is issued");
+        setMessage(response?.data.statusMsg);
         setIsError(true);
         setIsMessage(true);
       }
@@ -347,6 +361,8 @@ function BooksTable({
     }
   };
 
+  
+
   const columns = [
     { header: "S.no", accessor: "sno" },
     { header: "Title", accessor: "title" },
@@ -362,25 +378,29 @@ function BooksTable({
             imageSrc={editIcon}
             active={true}
             onClick={() => handleEdit(row)}
+            tooltip="edit"
           />
           <Button
             className="table-btn"
             imageSrc={deleteIcon}
             active={true}
             onClick={() => handleDelete(row)}
-            disabled={row.availability === 0}
+            tooltip="delete"
           />
           <Button
             className="table-btn"
             imageSrc={historyIcon}
             active={true}
             onClick={() => handleHistory(row)}
+            tooltip="view history"
           />
           <Button
             className="table-btn"
             imageSrc={assignIcon}
             active={true}
             onClick={() => handleAssign(row)}
+            disabled={row.availability === 0}
+            tooltip={row.availability === 0 ? "Book is not available at this moment" : "Assign book"}
           />
         </div>
       ),
@@ -392,7 +412,7 @@ function BooksTable({
     : { height: "550", width: "400px" };
   const deleteModalDimension = isMessage
     ? { height: "280px", width: "300px" }
-    : { height: "320px", width: "300px" };
+    : { height: "220px", width: "300px" };
   return (
     <div className="table-container">
       {data.length > 0 ? (
@@ -450,18 +470,13 @@ function BooksTable({
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
           />
-          <label htmlFor="category">Category</label>
-          <select
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-          >
-            <option value="">Select Category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.categoryName}
-              </option>
-            ))}
-          </select>
+         <label htmlFor="category">Category</label>
+          <Dropdown
+            options={categoryOptions}
+            onSelect={handleCategorySelect}
+            placeholder="Select Category"
+            initialValue={categoryOptions.find(opt => opt.value === categoryId)}
+          />
           <label htmlFor="availability">Availability</label>
           <input
             type="text"
@@ -522,7 +537,9 @@ function BooksTable({
             {message}
           </p>
         )}
-        <form onSubmit={handleAssignmentSubmit}>
+
+       
+ <form onSubmit={handleAssignmentSubmit}>
           <label htmlFor="username">Title</label>
           <input
             type="text"
@@ -531,12 +548,11 @@ function BooksTable({
             style={{ color: "black" }}
           />
           <label htmlFor="mobileNumber">User:</label>
-
-          <label htmlFor="status">Status:</label>
-          <select value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="">Select Status</option>
-            <option value="ISSUED">Issued</option>
-          </select>
+          <Dropdown
+            options={userOptions}
+            onSelect={handleUserSelect}
+            placeholder="Select User"
+          />
 
           <label htmlFor="issuanceType">Issuance Type:</label>
           <select
@@ -547,14 +563,27 @@ function BooksTable({
             <option value="IN-HOUSE">IN-HOUSE</option>
             <option value="TAKE AWAY">TAKE-AWAY</option>
           </select>
-          <label htmlFor="returndate">Returned At</label>
-          <input
-            label="Return Date"
-            type="datetime-local"
-            value={returnDate}
-            min={issueDate}
-            onChange={(e) => setReturnDate(e.target.value)}
-          />
+          {issuanceType === "IN-HOUSE" ? (
+            <input
+              label="Return Time"
+              type="time"
+              value={returnDate ? returnDate.split("T")[1] : ""} 
+              onChange={(e) => {
+                const datePart =
+                  returnDate.split("T")[0] ||
+                  new Date().toISOString().split("T")[0];
+                setReturnDate(`${datePart}T${e.target.value}`);
+              }}
+            />
+          ) : (
+            <input
+              label="Return Date & Time"
+              type="datetime-local"
+              value={returnDate || ""} 
+              onChange={(e) => setReturnDate(e.target.value)}
+              min={issueDate}
+            />
+          )}
 
           <div className="modal-button-group">
             <Button className="modal-btn" type="submit" name="Assign" />

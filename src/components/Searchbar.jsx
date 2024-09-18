@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import '../styles/SearchBar.css';
-import SearchIcon from '../assets/searchIcon.svg';
+import SearchIcon from '../assets/seachIcon.svg';
 
 function Searchbar({ onSearch }) {
   const [searchInput, setSearchInput] = useState('');
@@ -33,6 +33,7 @@ function Searchbar({ onSearch }) {
   };
 
   return (
+    <>
     <div className="search-bar">
       <input
         type="text"
@@ -41,9 +42,11 @@ function Searchbar({ onSearch }) {
         onChange={handleSearch}
         onKeyDown={handleKeyDown}
       />
-      <img src={SearchIcon} alt="search" className="search-icon" />
-      {errorMessage && <p className="search-error-message">{errorMessage}</p>}
+  
+      <img src={SearchIcon} alt='search' className="search-icon"/>
     </div>
+      {errorMessage && <p className="search-error-message">{errorMessage}</p>}
+      </>
   );
 }
 

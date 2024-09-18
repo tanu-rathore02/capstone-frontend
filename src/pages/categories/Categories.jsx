@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/Navbar"
 import Header from "../../components/Header";
 import HocWrapper from "../../components/HocWrapper";
 import Button from "../../components/Button";
 import Searchbar from "../../components/Searchbar";
-import CategoryTable from "./CategoryTable";
+import CategoryTable from "./CategoryTable"
 import Modal from "../../components/Modal";
 import { postRequest } from "../../api/ApiManager";
 import { CREATE_CATEGORY } from "../../api/ApiConstants";
@@ -21,6 +21,9 @@ function Categories({setLoading}) {
 
   const handleButtonClick = () => {
     setIsModalOpen(true);
+    setIsMessage(false);
+    setIsError(false);
+    setMessage("");
   };
 
   const handleCloseModal = () => {
@@ -52,12 +55,12 @@ function Categories({setLoading}) {
     
 
     const categoryData = {
-      categoryName: categoryName,
+      categoryName: categoryName.trim(),
     };
 
     postRequest(CREATE_CATEGORY, categoryData, (response) => {
       if (response?.status === 200 || response?.status === 201) {
-        setMessage("Category added successfully!");
+        setMessage(response?.data.statusMsg);
         setIsMessage(true);
         setIsError(false);
         setRefresh((prev) => !prev);
@@ -66,14 +69,12 @@ function Categories({setLoading}) {
           setCategoryName("");
         }, 2000);
       } else if (response?.status === 409) {
-        setMessage("Category with this name already exists!");
+        setMessage(response?.data.statusMsg);
         setIsMessage(true);
-
         setIsError(true);
       } else {
-        setMessage("Failed to add category. Please try again");
+        setMessage(response?.data.statusMsg);
         setIsMessage(true);
-
         setIsError(true);
       
       }
@@ -123,15 +124,16 @@ function Categories({setLoading}) {
         <form onSubmit={handleCategorySubmit}>
           <label htmlFor="categoryName">Category Name</label>
           <input
+           id="categoryName"
             type="text"
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
           />
           <div className="modal-button-group">
-            <Button name="Add" className="table-btn" />
+            <Button name="Add" className="modal-btn" />
             <Button
               name="Cancel"
-              className="table-btn"
+              className="modal-btn"
               onClick={handleCloseModal}
             />
           </div>

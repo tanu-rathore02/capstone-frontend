@@ -1,44 +1,48 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import Loader from './Loader';
+import Header from './Header';
+import Navbar from './Navbar';
+import HocWrapper from './HocWrapper';
 import TableComponent from './TableComponent';
+import { getRequest } from '../api/ApiManager';
+import { GET_ISSUANCE_BY_USER } from '../api/ApiConstants';
+import '../styles/IssuanceHistory.css';
 
 function IssuanceHistoryByUser() {
   const { userId } = useParams(); 
   const [data, setData] = useState([]);
   
-  const fetchIssuanceHistory = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:8080/api/issuances/user/${userId}`, {
-        headers: { Authorization: token },
-      });
-
  
-
-      if (response.data && Array.isArray(response.data)) {
-        setData(response.data.map((issuance, index) => ({
+const fetchIssuanceHistory = async () => {
+  const fetchCallback = (response) => {
+    if (response?.data && Array.isArray(response.data)) {
+      setData(
+        response.data.map((issuance, index) => ({
           sno: index + 1,
           title: issuance.books?.title || 'N/A',
-          issueDate: issuance.issueDate ? new Date(issuance.issueDate).toLocaleDateString() : 'N/A',
-          returnDate: issuance.returnDate ? new Date(issuance.returnDate).toLocaleDateString() : 'N/A',
+          issueDate: issuance.issueDate
+            ? new Date(issuance.issueDate).toLocaleDateString()
+            : 'N/A',
+          returnDate: issuance.returnDate
+            ? new Date(issuance.returnDate).toLocaleDateString()
+            : 'N/A',
           status: issuance.status || 'N/A',
           issuanceType: issuance.issuanceType || 'N/A',
-        })));
-      } else {
-      
-        setData([]); 
-      }
-    } catch (error) {
-   
-      setData([]);
+        }))
+      );
+    } else {
+      setData([]); 
     }
   };
 
-  useEffect(() => {
-    fetchIssuanceHistory();
-  }, [userId]);
+  await getRequest(GET_ISSUANCE_BY_USER + userId, fetchCallback);
+};
+
+useEffect(() => {
+  fetchIssuanceHistory();
+}, [userId]);
 
   const columns = [
     { header: 'S.no.', accessor: 'sno' },
@@ -57,5 +61,5 @@ function IssuanceHistoryByUser() {
   );
 }
 
-export default IssuanceHistoryByUser;
+export default  HocWrapper(Navbar, Header, Loader) (IssuanceHistoryByUser);
 

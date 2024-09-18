@@ -12,50 +12,25 @@ import issuedBooks from "../assets/issuedBooks.png";
 import { Link } from "react-router-dom";
 
 import { getRequest } from "../api/ApiManager";
-import { GET_BOOK_COUNT, GET_USER_COUNT, GET_CATEGORY_COUNT, GET_INHOUSE_READER_COUNT,GET_USER } from "../api/ApiConstants"; 
+import {GET_DASHBOARD_COUNT ,GET_USER } from "../api/ApiConstants"; 
 
 function AdminDashboard({showPagination = false, setLoading}) {
 
-  const [bookCount, setBookCount] = useState(0);
-  const [userCount, setUserCount] = useState(0);
-  const [categoryCount, setCategoryCount] = useState(0);
-  const [reader, setReader] = useState(0);
+  const [counts, setCounts] = useState({
+    userCount: 0,
+    activeUserCount: 0,
+    categoryCount: 0,
+    bookCount: 0
+  });
   const [data, setData] = useState([]);
-
  
-  const fetchUsers = () => {
-    getRequest( GET_USER_COUNT, (response) => {
+  const fetchCounts = () => {
+    getRequest(GET_DASHBOARD_COUNT, (response) => {
       if (response && response.data) {
-        setUserCount(response.data);
+        setCounts(response.data);
       }
     });
   };
-
-  const fetchInHouseReaders = () => {
-    getRequest(GET_INHOUSE_READER_COUNT, (response) => {
-      if (response && response.data) {
-        setReader(response.data);
-      }
-    });
-  };
-
-
-  const fetchCategories = () => {
-    getRequest(GET_CATEGORY_COUNT, (response) => {
-      if (response && response.data) {
-        setCategoryCount(response.data);
-      }
-    });
-  };
-
-  const fetchBooks = () => {
-    getRequest(GET_BOOK_COUNT, (response) => {
-      if (response && response.data) {
-        setBookCount(response.data);
-      }
-    });
-  };
-
 
   const fetchData = () => { 
     setLoading(true);
@@ -78,10 +53,7 @@ function AdminDashboard({showPagination = false, setLoading}) {
   };
 
   useEffect(() => {
-    fetchBooks();
-    fetchUsers();
-    fetchCategories();
-    fetchInHouseReaders();
+    fetchCounts();
     fetchData();
   }, []);
 
@@ -95,10 +67,10 @@ function AdminDashboard({showPagination = false, setLoading}) {
   return (
     <div className="dashboard-container">
       <div className="cards-container">
-        <Card name="Total Users" value={userCount} image={totalUsers} />
-        <Card name="In-House Readers" value={reader} image={inHouseReaders} />
-        <Card name="Total Categories" value={categoryCount} image={totalBooks} />
-        <Card name="Total Books" value={bookCount} image={issuedBooks} />
+      <Card name="Total Users" value={counts.userCount} image={totalUsers} />
+        <Card name="In-House Readers" value={counts.activeUserCount} image={inHouseReaders} />
+        <Card name="Total Categories" value={counts.categoryCount} image={totalBooks} />
+        <Card name="Total Books" value={counts.bookCount} image={issuedBooks} />
       </div>
       <h2 className="heading">Registered Users</h2>
       <div  className="admin-table">

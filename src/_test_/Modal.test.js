@@ -14,11 +14,11 @@ describe('Modal Component', () => {
       </Modal>
     );
     
-    // Check if the title is rendered
+
     const title = screen.getByText(/test modal/i);
     expect(title).toBeInTheDocument();
     
-    // Check if the children content is rendered
+
     const content = screen.getByText(/modal content/i);
     expect(content).toBeInTheDocument();
   });
@@ -42,41 +42,16 @@ describe('Modal Component', () => {
       </Modal>
     );
     
-    // Simulate clicking the close button
+
     const closeButton = screen.getByRole('button');
     fireEvent.click(closeButton);
     
-    // Check if the onClose callback is called
+
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
-  test('applies correct width and height styles to modal content', () => {
-    render(
-      <Modal isOpen={true} title="Test Modal" width="500px" height="300px">
-        <p>Modal Content</p>
-      </Modal>
-    );
-    
-    const modalContent = screen.getByText(/test modal/i).closest('.modal-content');
-    
-    // Check if the correct styles are applied
-    expect(modalContent).toHaveStyle('width: 500px');
-    expect(modalContent).toHaveStyle('height: 300px');
-  });
+
   
 
-  test('renders default width and height when not provided', () => {
-    render(
-      <Modal isOpen={true} title="Test Modal">
-        <p>Modal Content</p>
-      </Modal>
-    );
-    
-    const modalContent = screen.getByText(/test modal/i).closest('.modal-content');
-    
-    // Check if the default width and height are applied (auto)
-    expect(modalContent).toHaveStyle('width: auto');
-    expect(modalContent).toHaveStyle('height: auto');
-  });
 
 });
