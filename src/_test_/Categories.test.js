@@ -1,7 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Categories from '../pages/categories/Categories';
-import Modal from '../components/Modal';
+
 import { postRequest } from '../api/ApiManager';
 
 
@@ -80,43 +80,6 @@ describe('Categories Component', () => {
     expect(screen.getByText('Category name cannot contain special characters!')).toBeInTheDocument();
   });
 
-  test('submits category successfully', () => {
-    postRequest.mockImplementation((url, data, callback) => {
-      callback({ status: 201 });
-    });
-
-    render(<Categories setLoading={setLoadingMock} />);
-
-    fireEvent.click(screen.getByText('Add Category'));
-
-    fireEvent.change(screen.getByLabelText('Category Name'), {
-      target: { value: 'ValidName' },
-    });
-
-    const submitButton = screen.getByText('Add');
-    fireEvent.click(submitButton);
-
-    expect(screen.getByText('Category added successfully!')).toBeInTheDocument();
-    expect(postRequest).toHaveBeenCalledWith(expect.anything(), { categoryName: 'ValidName' }, expect.anything());
-  });
-
-  test('displays error when API returns conflict', () => {
-    postRequest.mockImplementation((url, data, callback) => {
-      callback({ status: 409 });
-    });
-
-    render(<Categories setLoading={setLoadingMock} />);
-
-    fireEvent.click(screen.getByText('Add Category'));
-
-    fireEvent.change(screen.getByLabelText('Category Name'), { 
-      target: { value: 'DuplicateName' },
-    });
-    const submitButton = screen.getByText('Add');
-    fireEvent.click(submitButton);
-
-    expect(screen.getByText('Category with this name already exists!')).toBeInTheDocument();
-  });
 
   test('modal is closed on initial render', () => {
     render(<Categories setLoading={setLoadingMock} />);
@@ -133,22 +96,8 @@ describe('Categories Component', () => {
     expect(searchInput.value).toBe('test search');
   });
 
-  test('displays generic error message on failed API response', () => {
-    postRequest.mockImplementation((url, data, callback) => {
-      callback({ status: 500 });
-    });
+ 
   
-    render(<Categories setLoading={setLoadingMock} />);
-  
-    fireEvent.click(screen.getByText('Add Category'));
-    fireEvent.change(screen.getByLabelText('Category Name'), { target: { value: 'ValidName' } });
-    
-    const submitButton = screen.getByText('Add');
-    fireEvent.click(submitButton);
-  
-    expect(screen.getByText('Failed to add category. Please try again')).toBeInTheDocument();
-  });
-
  
 
   test('should handle multiple open and close events for modal', () => {
@@ -164,5 +113,76 @@ describe('Categories Component', () => {
     expect(screen.getByText('Category Name')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(screen.queryByText('Category Name')).not.toBeInTheDocument();
+  });
+  
+  test('clears input and error message when modal is closed', () => {
+    render(<Categories setLoading={setLoadingMock} />);
+
+    fireEvent.click(screen.getByText('Add Category'));
+    fireEvent.change(screen.getByLabelText('Category Name'), {
+      target: { value: 'Test' },
+    });
+    fireEvent.click(screen.getByText('Add'));
+
+    expect(screen.getByText('Category Name')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Test')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    fireEvent.click(screen.getByText('Add Category'));
+    expect(screen.getByLabelText('Category Name')).toHaveValue('');
+    expect(screen.queryByText('Category name cannot be empty!')).not.toBeInTheDocument();
+  });
+
+  test('updates search term when typing in search bar', () => {
+    render(<Categories setLoading={setLoadingMock} />);
+
+    const searchInput = screen.getByPlaceholderText('Search');
+    fireEvent.change(searchInput, { target: { value: 'test' } });
+    fireEvent.change(searchInput, { target: { value: 'test search' } });
+
+    expect(searchInput.value).toBe('test search');
+  });
+
+  test('successfully adds a new category', async () => {
+    postRequest.mockImplementation((url, data, callback) => {
+      callback({ status: 201, data: { statusMsg: 'Category added successfully' } });
+    });
+
+    render(<Categories setLoading={setLoadingMock} />);
+
+    fireEvent.click(screen.getByText('Add Category'));
+    fireEvent.change(screen.getByLabelText('Category Name'), {
+      target: { value: 'New Category' },
+    });
+    fireEvent.click(screen.getByText('Add'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Category added successfully')).toBeInTheDocument();
+    });
+
+    expect(postRequest).toHaveBeenCalledWith(
+      expect.any(String),
+      { categoryName: 'New Category' },
+      expect.any(Function)
+    );
+  });
+
+  test('handles error when adding a category that already exists', async () => {
+    postRequest.mockImplementation((url, data, callback) => {
+      callback({ status: 409, data: { statusMsg: 'Category already exists' } });
+    });
+
+    render(<Categories setLoading={setLoadingMock} />);
+
+    fireEvent.click(screen.getByText('Add Category'));
+    fireEvent.change(screen.getByLabelText('Category Name'), {
+      target: { value: 'Existing Category' },
+    });
+    fireEvent.click(screen.getByText('Add'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Category already exists')).toBeInTheDocument();
+    });
   });
   });

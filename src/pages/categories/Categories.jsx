@@ -89,7 +89,7 @@ function Categories({setLoading}) {
     : { height: "280px", width: "300px" };
 
     useEffect(()=>{
-      // alert(setLoading)
+     
     },[])
 
   return (

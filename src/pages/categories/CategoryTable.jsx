@@ -31,14 +31,14 @@ function CategoryTable({
   const fetchData = () => {
     setLoading(true);
     getRequest(
-      `${GET_CATEGORY}?page=${currentPage}&size=6&sortBy=id&sortDir=desc&search=${
+      `${GET_CATEGORY}?page=${currentPage}&size=7&sortBy=id&sortDir=desc&search=${
         searchTerm || ""
       }`,
       (response) => {
         if (response?.status === 200 || response?.status === 201) {
           setData(
             response.data.content.map((category, index) => ({
-              sno: index + 1 + currentPage * 6,
+              sno: index + 1 + currentPage * 7,
               categoryName: category.categoryName,
               id: category.id,
             }))

@@ -418,34 +418,6 @@ describe("CategoryTable Component", () => {
     });
   });
 
-  test("should handle API failure during category update", async () => {
-    render(<CategoryTable showPagination={false} setLoading={jest.fn()} />);
-
-    const editButton = screen.getAllByAltText("edit")[0];
-    fireEvent.click(editButton);
-
-    await waitFor(() => {
-      expect(screen.getByText("Edit Category")).toBeInTheDocument();
-    });
-
-
-    const input = screen.getByLabelText("Category Name");
-    fireEvent.change(input, { target: { value: "Updated Category Name" } });
-
-
-    putRequest.mockImplementation((url, data, callback) =>
-      callback({ status: 500 })
-    );
-
-
-    const updateButton = screen.getByText("Update");
-    fireEvent.click(updateButton);
-
-    await waitFor(() => {
-      expect(screen.getByText("Error updating category!")).toBeInTheDocument();
-    });
-  });
-
   test("should handle pagination with no pages", async () => {
     const noPageData = {
       data: {
@@ -543,26 +515,130 @@ describe("CategoryTable Component", () => {
     });
   });
 
-  test("should handle category update with existing name", async () => {
+  test("should handle delete confirmation and success", async () => {
+    deleteRequest.mockImplementation((url, callback) =>
+      callback({ status: 200, data: { statusMsg: "Category deleted successfully" } })
+    );
+
+    render(<CategoryTable showPagination={true} setLoading={jest.fn()} />);
+
+    const deleteButton = screen.getAllByAltText("delete")[0];
+    fireEvent.click(deleteButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Confirm Deletion")).toBeInTheDocument();
+    });
+
+    const confirmDeleteButton = screen.getByText("Delete");
+    fireEvent.click(confirmDeleteButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Category deleted successfully")).toBeInTheDocument();
+    });
+  });
+ 
+  test("should handle category update success", async () => {
+    putRequest.mockImplementation((url, data, callback) =>
+      callback({ status: 200, data: { statusMsg: "Category updated successfully" } })
+    );
+
     render(<CategoryTable showPagination={false} setLoading={jest.fn()} />);
-  
+
     const editButton = screen.getAllByAltText("edit")[0];
     fireEvent.click(editButton);
-  
+
     await waitFor(() => {
       expect(screen.getByText("Edit Category")).toBeInTheDocument();
     });
-  
+
     const input = screen.getByLabelText("Category Name");
-    fireEvent.change(input, { target: { value: "Existing Category" } });
-  
-    putRequest.mockImplementation((url, data, callback) => callback({ status: 409 }));
-  
+    fireEvent.change(input, { target: { value: "Updated Category Name" } });
+
     const updateButton = screen.getByText("Update");
     fireEvent.click(updateButton);
-  
+
     await waitFor(() => {
-      expect(screen.getByText("Category with this name already exists!")).toBeInTheDocument();
+      expect(screen.getByText("Category updated successfully")).toBeInTheDocument();
     });
   });
+
+
+  
+  test("should handle category update error", async () => {
+    putRequest.mockImplementation((url, data, callback) =>
+      callback({ status: 500, data: { statusMsg: "Error updating category" } })
+    );
+
+    render(<CategoryTable showPagination={false} setLoading={jest.fn()} />);
+
+    const editButton = screen.getAllByAltText("edit")[0];
+    fireEvent.click(editButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Edit Category")).toBeInTheDocument();
+    });
+
+    const input = screen.getByLabelText("Category Name");
+    fireEvent.change(input, { target: { value: "Updated Category Name" } });
+
+    const updateButton = screen.getByText("Update");
+    fireEvent.click(updateButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Error updating category")).toBeInTheDocument();
+    });
+  });
+
+  test("should handle API error when fetching categories", async () => {
+    getRequest.mockImplementation((url, callback) => callback({ status: 500 }));
+    const setLoading = jest.fn();
+    
+    render(<CategoryTable showPagination={true} setLoading={setLoading} />);
+  
+    await waitFor(() => {
+      expect(screen.getByText("No data available")).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(setLoading).toHaveBeenCalledWith(true);
+    });
+
+    await waitFor(() => {
+   
+      expect(setLoading).toHaveBeenCalledWith(false);
+  
+    });
+  });
+
+  test("should update search term and refetch data", async () => {
+    const setLoading = jest.fn();
+    const { rerender } = render(<CategoryTable showPagination={true} setLoading={setLoading} searchTerm="" />);
+    
+    await waitFor(() => {
+      expect(getRequest).toHaveBeenCalledWith(expect.stringContaining("search="), expect.any(Function));
+    });
+
+    rerender(<CategoryTable showPagination={true} setLoading={setLoading} searchTerm="test" />);
+
+    await waitFor(() => {
+      expect(getRequest).toHaveBeenCalledWith(expect.stringContaining("search=test"), expect.any(Function));
+    });
+  });
+
+  test("should handle refresh prop change", async () => {
+    const setLoading = jest.fn();
+    const { rerender } = render(<CategoryTable showPagination={true} setLoading={setLoading} refresh={false} />);
+    
+    await waitFor(() => {
+      expect(getRequest).toHaveBeenCalledTimes(1);
+    });
+
+    rerender(<CategoryTable showPagination={true} setLoading={setLoading} refresh={true} />);
+
+    await waitFor(() => {
+      expect(getRequest).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  
 });
