@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import Header from './Header';
 import Navbar from './Navbar';
 import HocWrapper from './HocWrapper';
@@ -58,8 +57,15 @@ useEffect(() => {
   return (
     <div className="issuance-history-container">
      <h2 style={{ textAlign: 'center' }}>Issuance History</h2>
+     {data.length > 0 ? (
+        <>
       <TableComponent 
         columns={columns} data={data} />
+         </>
+      ) : (
+        <p className="no-data-message">No data available</p>
+      )}
+
     </div>
   );
 }

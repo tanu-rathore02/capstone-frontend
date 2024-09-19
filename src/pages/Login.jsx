@@ -77,6 +77,7 @@ function Login() {
         : { username: phoneNo, "password": encodedPassword };
 
     postRequestWithoutAuth(LOGIN_API, credentials, (response) => {
+ 
       if (response?.status === 200 || response?.status === 201) {
         const { token, id, name } = response.data; 
 
@@ -90,10 +91,10 @@ function Login() {
  
 
         navigate(userType === "ADMIN" ? "/adminDashboard" : "/userDashboard");
-      } else if (response?.status === 400) {
-        setErrors({ general: "Incorrect username or password. Please try again." });
+      } else if (response?.status === 502) {
+        setErrors({ general: response?.data });
       } else {
-        setErrors({ general: "Login failed. Please try again." });
+        setErrors({ general: response?.data });
       }
     });
   };

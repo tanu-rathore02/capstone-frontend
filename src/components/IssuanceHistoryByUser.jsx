@@ -56,7 +56,13 @@ useEffect(() => {
   return (
     <div className="issuance-history-container">
       <h2 style={{ textAlign: 'center' }}>Issuance History</h2>
+      {data.length > 0 ? (
+        <>
       <TableComponent columns={columns} data={data} />
+      </>
+      ) : (
+        <p className="no-data-message">No data available</p>
+      )}
     </div>
   );
 }

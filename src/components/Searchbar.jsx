@@ -12,7 +12,7 @@ function Searchbar({ onSearch }) {
     if (trimmedValue.length === 0) {
       setErrorMessage('');
       onSearch('');
-      setDebouncedSearchTerm('');
+      setDebouncedSearchTerm('')
     } else if (trimmedValue.length < 3) {
       setErrorMessage('Search term must be at least 3 characters long');
     } else {

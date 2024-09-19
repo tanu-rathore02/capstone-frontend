@@ -60,7 +60,13 @@ const UserDashboard = () => {
     <div className="user-dashboard-container">
       <h1 className="user-dashboard-heading">User History</h1>
       <div className="table-wrapper">
+      {data.length > 0 ? (
+        <>
         <TableComponent columns={columns} data={data} />
+        </>
+      ) : (
+        <p className="no-data-message">No data available</p>
+      )}
       </div>
     </div>
   );

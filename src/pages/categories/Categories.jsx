@@ -85,7 +85,7 @@ function Categories({setLoading}) {
     setSearchTerm(term);
   };
   const modalDimension = isMessage
-    ? { height: "310px", width: "300px" }
+    ? { height: "320px", width: "300px" }
     : { height: "280px", width: "300px" };
 
     useEffect(()=>{
